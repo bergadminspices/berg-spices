@@ -52,6 +52,7 @@
       </a>
     {% else %}
       <form action="{{ url_for('bulk_remove') }}" method="POST">
+        {{ csrf_token() }}
         <div class="table-responsive">
           <table class="table table-striped align-middle cart-table">
             <thead>
