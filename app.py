@@ -67,7 +67,7 @@ limiter = Limiter(
 
 if not os.environ.get("FLASK_SECRET"):
     raise RuntimeError("FLASK_SECRET not set")
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+app.secret_key = os.environ["FLASK_SECRET"]
   # change for production
 
 app.config.update(
