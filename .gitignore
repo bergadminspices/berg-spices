@@ -1,0 +1,6 @@
+berg.env
+.env
+__pycache__/
+*.pyc
+desktop.ini
+venv/
