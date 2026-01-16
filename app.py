@@ -59,30 +59,38 @@ ORDER_STATUSES = {
 # App init
 # -------------------------
 app = Flask(__name__)
-    app.wsgi_app = ProxyFix(
+
+# ✅ ProxyFix FIRST (Render requirement)
+app.wsgi_app = ProxyFix(
     app.wsgi_app,
     x_for=1,
     x_proto=1,
     x_host=1,
     x_port=1
 )
-csrf = CSRFProtect(app)
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["200 per day", "50 per hour"]
-)
 
+# ✅ SECRET KEY MUST come before CSRF
 if not os.environ.get("FLASK_SECRET"):
     raise RuntimeError("FLASK_SECRET not set")
-app.secret_key = os.environ["FLASK_SECRET"]
-  # change for production
 
+app.secret_key = os.environ["FLASK_SECRET"]
+
+# ✅ Session & CSRF config
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    WTF_CSRF_SSL_STRICT=False,   # 🔑 REQUIRED on Render
+    WTF_CSRF_SSL_STRICT=False,
+)
+
+# ✅ NOW initialize CSRF
+csrf = CSRFProtect(app)
+
+# ✅ Limiter can come after
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
 )
 
 # -------------------------
