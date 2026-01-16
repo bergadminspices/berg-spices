@@ -2,6 +2,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 load_dotenv()
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import send_file
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from datetime import datetime
@@ -58,6 +59,13 @@ ORDER_STATUSES = {
 # App init
 # -------------------------
 app = Flask(__name__)
+    app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,
+    x_proto=1,
+    x_host=1,
+    x_port=1
+)
 csrf = CSRFProtect(app)
 limiter = Limiter(
     get_remote_address,
@@ -71,9 +79,10 @@ app.secret_key = os.environ["FLASK_SECRET"]
   # change for production
 
 app.config.update(
-    SESSION_COOKIE_SECURE=True,      # HTTPS only
-    SESSION_COOKIE_HTTPONLY=True,    # JS can't access
-    SESSION_COOKIE_SAMESITE="Lax"
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    WTF_CSRF_SSL_STRICT=False,   # 🔑 REQUIRED on Render
 )
 
 # -------------------------
