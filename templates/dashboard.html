@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Dashboard - BERG SPICES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <div class="container mt-5">
+    <h2 class="mb-4 text-success">Welcome, {{ user.name }}</h2>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button">Orders</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cart-tab" data-bs-toggle="tab" data-bs-target="#cart" type="button">Cart</button>
+      </li>
+      </ul>
+
+    <div class="tab-content mt-3">
+
+      <!-- Orders Tab -->
+      <div class="tab-pane fade show active" id="orders">
+        {% if orders %}
+          {% set status_color = {
+            'PLACED':'secondary', 'PAYMENT_PENDING':'warning', 'PREPARING':'primary',
+            'SHIPPED':'info', 'DELIVERED':'success', 'DELAYED':'danger', 
+            'CANCELLED':'dark', 'REFUND_INITIATED':'warning', 'REFUNDED':'success'
+          } %}
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+              <thead class="table-success">
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                  <th>Mobile</th>
+                  <th>Total</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                  <tr>
+                    <td>{{ order.order_id }}</td>
+                    <td>{{ order.created_at_str }}</td>
+                    <td>
+                      <span class="badge bg-{{ status_color.get(order.status, 'secondary') }}">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td>{{ order.payment.method if order.payment else '-' }}</td>
+                    <td>{{ order.phone }}</td>
+                    <td>₹{{ "%.2f"|format(order.total_amount) }}</td>
+                    <td>
+                      <a href="{{ url_for('customer_order_detail', order_id=order.order_id) }}" class="btn btn-sm btn-outline-success">View</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-info">You have not placed any orders yet.</div>
+        {% endif %}
+      </div>
+
+      <!-- Cart Tab -->
+      <div class="tab-pane fade" id="cart">
+        {% if cart_items %}
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead class="table-info">
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in cart_items %}
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ "%.2f"|format(item.price) }}</td>
+                    <td>₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                    <td>
+                      <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.id) }}">
+						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-danger">Remove</button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="text-end">
+              <a href="{{ url_for('checkout') }}" class="btn btn-success">Proceed to Checkout</a>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-info">Your cart is empty.</div>
+        {% endif %}
+      </div>
+
+      <!-- Profile Tab -->
+      <div class="tab-pane fade" id="profile">
+        <div class="card p-3">
+          <h5>Profile Information</h5>
+          <p><strong>Name:</strong> {{ user.name }}</p>
+          <p><strong>Email:</strong> {{ user.email }}</p>
+          <p><strong>Mobile:</strong> {{ user.mobile }}</p>
+          <p><strong>Address:</strong> {{ user.address or 'Not provided' }}</p>
+          <a href="{{ url_for('profile') }}" class="btn btn-warning">Edit Profile</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

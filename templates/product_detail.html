@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ product.name }} - BERG SPICES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #fffdf5; }
+    .navbar { background: #2e7d32; }
+    .navbar-brand img { height: 100px; border-radius: 40px; }
+    .brand-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.76rem; color: #fbc02d; }
+    .navbar-quote { font-size: 0.9rem; font-style: italic; color: #fbc02d; }
+    .product-img { max-height: 300px; object-fit: contain; }
+    .btn-success { background-color: #2e7d32 !important; border: none; }
+    .btn-success:hover { background-color: #256428 !important; }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <div class="container py-5">
+    <div class="row">
+      <div class="col-md-5 text-center">
+        <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}" class="img-fluid product-img">
+      </div>
+      <div class="col-md-7">
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+
+        <!-- Alerts -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Add to Cart -->
+        <form action="{{ url_for('add_to_cart', product_id=product['_id']) }}" method="POST">
+          <h5>Select Packet Size:</h5>
+          {% for option in product.price_options %}
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="packet_option" id="{{ product['_id'] }}_{{ option.label }}" value="{{ option.label }}" required>
+              <label class="form-check-label" for="{{ product['_id'] }}_{{ option.label }}">
+                {{ option.label }} - ₹{{ option.price }}
+              </label>
+            </div>
+          {% endfor %}
+
+          <div class="mb-3 mt-3">
+            <label for="qty" class="form-label">Quantity:</label>
+            <input type="number" name="quantity" id="qty" value="1" min="1" class="form-control" style="width:120px;">
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-success btn-lg">Add to Cart</button>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">Continue Shopping</a>
+          </div>
+        </form>
+
+        <!-- Remove from Cart button (only if already in cart) -->
+        {% if product_in_cart %}
+        <form action="{{ url_for('remove_from_cart', product_id=product['_id']) }}" method="POST" class="mt-3">
+          <button type="submit" class="btn btn-danger btn-lg">Remove from Cart</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

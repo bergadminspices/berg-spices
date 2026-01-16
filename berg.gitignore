@@ -1,0 +1,5 @@
+berg.env
+__pycache__/
+.env
+venv/
+*.pyc

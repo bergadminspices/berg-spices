@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin - View Inquiry</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body { background: #f6f8fa; }
+
+    /* Sidebar (keeps same look as listing page) */
+    .sidebar {
+      height: 100vh;
+      background: #2e7d32;
+      padding-top: 20px;
+      color: white;
+      position: fixed;
+      width: 220px;
+    }
+    .sidebar a { color: white; text-decoration: none; padding: 12px 20px; display: block; font-weight: 500; }
+    .sidebar a:hover { background: #256428; border-radius: 5px; }
+
+    /* Content */
+    .content { margin-left: 240px; padding: 24px; }
+
+    /* Chat/container */
+    .chat-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .chat-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .card-chat {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 6px 18px rgba(18, 38, 63, 0.06);
+    }
+
+    /* Message bubbles */
+    .msg-row { display:flex; margin-bottom:12px; align-items:flex-end; }
+    .msg-left { justify-content:flex-start; }
+    .msg-right { justify-content:flex-end; }
+
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 14px;
+      max-width: 78%;
+      line-height:1.45;
+      word-wrap: break-word;
+      box-shadow: 0 2px 6px rgba(15,23,42,0.04);
+    }
+
+    .bubble-customer {
+      background: #eef2f6; /* soft gray */
+      color: #0f172a;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 14px;
+      border-bottom-right-radius: 14px;
+      border-bottom-left-radius: 14px;
+    }
+
+    .bubble-admin {
+      background: #e6f4ea; /* soft green */
+      color: #042e17;
+      border-top-right-radius: 4px;
+      border-top-left-radius: 14px;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      text-align: left;
+    }
+
+    .meta {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .sender {
+      font-weight:600;
+    }
+    .timestamp {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    /* Reply area */
+    .reply-area {
+      margin-top: 16px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .reply-area textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Small screens */
+    @media (max-width: 768px) {
+      .content { margin-left: 8px; padding: 12px; }
+      .chat-container { padding: 0 6px; }
+      .bubble { max-width: 92%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h4 class="text-center mb-4">Admin Panel</h4>
+    <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+    <a href="{{ url_for('admin_view_orders') }}"><i class="fas fa-box me-2"></i> Orders</a>
+    <a href="{{ url_for('admin_inquiries') }}"><i class="fas fa-envelope me-2"></i> Messages</a>
+    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+  </div>
+
+  <div class="content">
+    <div class="chat-container">
+      <div class="chat-header">
+        <div>
+          <a href="{{ url_for('admin_inquiries') }}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i> Back to messages</a>
+        </div>
+        <div class="text-end">
+          <small class="text-muted">Inquiry ID: <strong>{{ inquiry._id }}</strong></small>
+        </div>
+      </div>
+
+      <div class="card-chat">
+        <!-- header: customer info -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="mb-0">{{ inquiry.name }}</h5>
+            <small class="text-muted">{{ inquiry.email }}</small>
+          </div>
+          <div class="text-end">
+            <small class="text-muted">Sent: <strong>{{ inquiry.created_at.strftime('%Y-%m-%d %H:%M') if inquiry.created_at }}</strong></small>
+          </div>
+        </div>
+
+        <!-- Conversation stream -->
+        <div class="conversation mb-3">
+          <!-- initial customer message (left) -->
+          <div class="msg-row msg-left">
+            <div class="bubble bubble-customer">
+              <div class="meta">
+                <div class="sender">Customer</div>
+                <div class="timestamp">{{ inquiry.created_at }}</div>
+              </div>
+              <div class="message-body">{{ inquiry.message }}</div>
+            </div>
+          </div>
+
+          <!-- replies -->
+          {% if inquiry.replies %}
+            {% for reply in inquiry.replies %}
+    {% set is_admin = reply.from == 'admin' %}
+    <div class="msg-row {{ 'msg-right' if is_admin else 'msg-left' }}">
+        <div class="bubble {{ 'bubble-admin' if is_admin else 'bubble-customer' }}">
+            <div class="meta">
+                <div class="sender">
+                    {% if is_admin %}Admin{% else %}Customer{% endif %}
+                </div>
+                <div class="timestamp">
+                    {% set dt = reply.timestamp %}
+                    {% if dt %}
+                        {% if dt.__class__.__name__ == 'datetime' %}
+                            {{ dt.strftime('%Y-%m-%d %H:%M') }}
+                        {% else %}
+                            {{ dt }}
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+            <div class="message-body">{{ reply.message }}</div>
+        </div>
+    </div>
+{% endfor %}
+          {% else %}
+            <div class="msg-row msg-left">
+              <div class="bubble bubble-customer">
+                <div class="meta">
+                  <div class="sender">System</div>
+                  <div class="timestamp">{{ inquiry.created_at }}</div>
+                </div>
+                <div class="message-body text-muted">No replies yet</div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Admin reply form -->
+        <div class="reply-box">
+          <form action="{{ url_for('admin_reply_inquiry', inquiry_id=inquiry._id) }}" method="POST">
+    <div class="mb-2">
+      <label class="form-label"><strong>Reply to customer</strong></label>
+      <textarea name="reply_message" class="form-control" placeholder="Type your reply to customer..." required></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end align-items-center gap-2">
+      <button type="submit" class="btn btn-success">Send Reply</button>
+      <a href="{{ url_for('admin_inquiries') }}" class="btn btn-outline-secondary">Close</a>
+    </div>
+</form>
+
+        </div>
+      </div> <!-- card-chat -->
+    </div> <!-- chat-container -->
+  </div> <!-- content -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

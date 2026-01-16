@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      color: #000;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      height: 60px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #000;
+      padding: 6px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .total {
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .status-history {
+      margin-top: 20px;
+      font-size: 11px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .status-history li {
+      margin-bottom: 6px;
+    }
+
+    .comment {
+      display: block;
+      margin-left: 10px;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<table class="header">
+  <tr>
+    <td>
+      <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+    </td>
+    <td class="right">
+      <b>BERG SPICES</b><br>
+      Pure Aroma. Pure Taste<br>
+      GSTIN: XXXXX
+    </td>
+  </tr>
+</table>
+
+<hr>
+
+<!-- INVOICE INFO -->
+<p>
+  <b>Invoice No:</b> {{ order.get("order_id", "-") }}<br>
+  <b>Date:</b> {{ order.get("created_at_str", "-") }}
+</p>
+
+<!-- CUSTOMER INFO -->
+<h4>Billed To</h4>
+<p>
+  {{ order.get("name", "-") }}<br>
+  {{ order.get("phone", "-") }}<br>
+  {{ order.get("address", "-") | replace('\n', '<br>') | safe }}
+</p>
+
+<!-- ITEMS TABLE -->
+<table>
+  <tr>
+    <th>Item</th>
+    <th>Packet</th>
+    <th>Qty</th>
+    <th>Price</th>
+    <th>Subtotal</th>
+  </tr>
+
+  {% for item in order.get("items", []) %}
+  <tr>
+    <td>{{ item.get("name", "-") }}</td>
+    <td>{{ item.get("packet", "-") }}</td>
+    <td>{{ item.get("qty", 0) }}</td>
+    <td>₹{{ "%.2f"|format(item.get("price", 0)) }}</td>
+    <td>₹{{ "%.2f"|format(item.get("subtotal", 0)) }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<div class="total">
+  Grand Total: ₹{{ "%.2f"|format(order.get("total_amount", 0)) }}
+</div>
+
+<!-- STATUS HISTORY -->
+{% if order.get("logs") %}
+<h4>Status History</h4>
+<ul class="status-history">
+  {% for log in order.get("logs", []) %}
+    <li>
+      {{ log.get("timestamp", "-") }} — {{ log.get("action", "-") }}
+      {% if log.get("comment") %}
+        <span class="comment">Comment: {{ log.get("comment") }}</span>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<p>
+  This is a computer-generated invoice.<br>
+  Thank you for shopping with <b>BERG SPICES</b>.
+</p>
+
+</body>
+</html>

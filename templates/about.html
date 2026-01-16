@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us - BERG SPICES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+     body { background: #fffdf5; }
+    .navbar { background: #2e7d32; } /* Warm Green */
+    .navbar-brand img { height: 100px; border-radius: 40px; }
+    .brand-text {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.76rem;
+      color: #fbc02d;
+      line-height: 1.2;
+    }
+    .navbar-quote {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: #fbc02d;
+    }
+
+    .nav-link, .btn-cart { color: white !important; }
+    .nav-link:hover { color: #fbc02d !important; }
+
+    .category-title { color: #2e7d32; margin-top: 40px; margin-bottom: 20px; font-weight: bold; }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .btn-add {
+      background-color: #fbc02d;
+      color: black;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+    .btn-add:hover { background-color: #f9a825; }
+
+    .btn-success { background-color: #2e7d32 !important; border: none; }
+    .btn-success:hover { background-color: #256428 !important; }
+
+    /* Search box */
+    .search-input {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      width: 180px;
+      transition: width 0.3s ease;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.7); }
+    .search-input:focus {
+      width: 250px;
+      outline: none;
+      border-color: #fbc02d;
+    }
+
+    .content-box {
+      border: 3px solid #fbc02d;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 50px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .highlight { color: #2e7d32; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  {% include 'navbar.html' %}
+  <br>
+  <!-- About Hero Section -->
+<section class="about-hero text-center">
+  <div class="container">
+    <h1 class="fw-bold">About <span class="highlight">#BERG SPICES</span></h1>
+    <p class="lead mt-3">
+      The taste of mountains, crafted with purity and tradition
+    </p>
+  </div>
+</section>
+
+<!-- About Content -->
+<div class="container">
+  
+  <!-- Story Section -->
+  <div class="content-box">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h3 class="highlight mb-3">
+          <i class="fa-solid fa-seedling me-2"></i>Our Story
+        </h3>
+        <p>
+          At <strong>BERG SPICES</strong>, we believe great food begins with pure ingredients.
+          Our spices are carefully sourced from pristine mountain regions, where nature
+          nurtures flavor, aroma, and strength.
+        </p>
+        <p>
+          Every product reflects our promise of authenticity, freshness, and unmatched quality.
+        </p>
+      </div>
+      <div class="col-md-6 text-center">
+        <img src="{{ url_for('static', filename='spices.jpg') }}"
+             class="img-fluid rounded-4 shadow"
+             alt="Natural spices">
+      </div>
+    </div>
+  </div>
+
+  <!-- Values Section -->
+  <div class="content-box mt-5">
+    <h3 class="highlight text-center mb-4">
+      <i class="fa-solid fa-heart me-2"></i>What We Stand For
+    </h3>
+
+    <div class="row text-center">
+      <div class="col-md-4 mb-4">
+        <div class="value-card">
+          <i class="fa-solid fa-leaf fa-2x mb-3 text-success"></i>
+          <h6 class="fw-bold">100% Natural</h6>
+          <p class="text-muted small">
+            No additives, no compromises — just pure spices.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <div class="value-card">
+          <i class="fa-solid fa-mountain fa-2x mb-3 text-success"></i>
+          <h6 class="fw-bold">Mountain Sourced</h6>
+          <p class="text-muted small">
+            Handpicked from high-altitude regions.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <div class="value-card">
+          <i class="fa-solid fa-handshake fa-2x mb-3 text-success"></i>
+          <h6 class="fw-bold">Farmer First</h6>
+          <p class="text-muted small">
+            Supporting local farmers and sustainable practices.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mission Section -->
+  <div class="content-box mt-5 text-center">
+    <h3 class="highlight mb-3">
+      <i class="fa-solid fa-bullseye me-2"></i>Our Mission
+    </h3>
+    <p class="mx-auto" style="max-width: 700px;">
+      To bring authentic, healthy, and flavorful spices from the mountains
+      to kitchens around the world — while preserving nature and empowering communities.
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

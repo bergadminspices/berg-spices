@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Messages</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background: #e5ddd5; }
+
+    .chat-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background: #f0f0f0;
+      padding: 10px;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .messages-area {
+      padding: 20px;
+      background: #f7f8fa;
+      height: 70vh;
+      overflow-y: auto;
+    }
+
+    .msg-row { width: 100%; display: flex; margin-bottom: 10px; }
+    .msg-left { justify-content: flex-start; }
+    .msg-right { justify-content: flex-end; }
+
+    .bubble { max-width: 65%; padding: 10px 14px; border-radius: 12px; font-size: 18px; line-height: 1.4; word-wrap: break-word; }
+    .bubble-user { background: #dcf8c6; border-radius: 12px 12px 0 12px; }
+    .bubble-admin { background: #ffffff; border: 1px solid #dcdcdc; border-radius: 12px 12px 12px 0; }
+
+    .timestamp { font-size: 12px; text-align: right; margin-top: 5px; color: #777; }
+
+    .reply-box { padding: 12px; border-top: 1px solid #ddd; background: #fff; }
+  </style>
+</head>
+
+<body>
+
+{% include 'navbar.html' %}
+
+<div class="chat-container">
+
+  {% if inquiries %}
+    {% for inquiry in inquiries %}
+
+      <div class="chat-header">
+        Conversation started: {{ inquiry.created_at.strftime('%Y-%m-%d %H:%M') if inquiry.created_at.__class__.__name__=='datetime' else inquiry.created_at }}
+      </div>
+
+      <div class="messages-area">
+
+        <!-- CUSTOMER MAIN MESSAGE -->
+        <div class="msg-row msg-right">
+          <div class="bubble bubble-user">
+            {{ inquiry.message }}
+            <div class="timestamp">{{ inquiry.created_at.strftime('%Y-%m-%d %H:%M') if inquiry.created_at.__class__.__name__=='datetime' else inquiry.created_at }}</div>
+          </div>
+        </div>
+
+        <!-- REPLIES -->
+        {% for reply in inquiry.replies %}
+
+          {% set is_admin = reply.from is defined and reply.from != 'customer' or reply.admin_name is defined %}
+          {% set timestamp = reply.timestamp if reply.timestamp is defined else reply.sent_at %}
+
+          <div class="msg-row {% if is_admin %}msg-left{% else %}msg-right{% endif %}">
+            <div class="bubble {% if is_admin %}bubble-admin{% else %}bubble-user{% endif %}">
+              {% if is_admin %}
+                <strong>{{ 'Admin' }}:</strong><br>
+              {% else %}
+                <strong>You:</strong><br>
+              {% endif %}
+              {{ reply.message }}
+              <div class="timestamp">
+                {{ timestamp.strftime('%Y-%m-%d %H:%M') if timestamp.__class__.__name__=='datetime' else timestamp }}
+              </div>
+            </div>
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+      <!-- REPLY INPUT -->
+      <div class="reply-box">
+        <form action="{{ url_for('reply_to_admin', inquiry_id=inquiry._id) }}" method="POST">
+          <div class="input-group">
+            <input type="text" name="reply_message" class="form-control" placeholder="Write a message..." required>
+            <button class="btn btn-success">Send</button>
+          </div>
+        </form>
+      </div>
+
+    {% endfor %}
+  {% else %}
+    <p class="p-3">No messages found.</p>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

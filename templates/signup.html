@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #fffdf5; }
+    .navbar { background: #2e7d32; }
+    .navbar-brand img { height: 100px; border-radius: 40px; }
+    .brand-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.76rem; color: #fbc02d; line-height: 1.2; }
+    .navbar-quote { font-size: 0.9rem; font-style: italic; color: #fbc02d; }
+    .nav-link, .btn-cart { color: white !important; }
+    .nav-link:hover { color: #fbc02d !important; }
+    .card { border: none; border-radius: 15px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); }
+    .btn-success { background-color: #2e7d32 !important; border: none; }
+    .btn-success:hover { background-color: #256428 !important; }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('home') }}">
+      <img src="{{ url_for('static', filename='logo.jpg') }}" alt="BERG Spices Logo">
+    </a>
+    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+      <div class="ms-2 d-flex flex-column">
+        <span class="brand-text">BERG SPICES</span>
+        <span class="navbar-quote">"The taste of mountains"</span>
+      </div>
+    </a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('home') }}">Back to Home</a>
+        </li>
+      </ul>
+    </div>
+    <div class="ms-auto">
+      <a href="{{ url_for('view_cart') }}" class="btn btn-cart">
+        Cart ({{ cart_count or 0 }})
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Signup Form -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card p-4 shadow">
+        <h3 class="mb-3 text-center">Create Account</h3>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show">
+                {{ msg }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" novalidate>
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text"
+                   name="name"
+                   class="form-control"
+                   minlength="3"
+                   placeholder="Your full name"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email"
+                   name="email"
+                   class="form-control"
+                   placeholder="example@email.com"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="tel"
+                   name="phone"
+                   class="form-control"
+                   pattern="[0-9]{10}"
+                   title="Enter a 10-digit phone number"
+                   placeholder="10 digit mobile number"
+                   required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   minlength="8"
+                   placeholder="Minimum 8 characters"
+                   required>
+          </div>
+
+          <button class="btn btn-success w-100">Sign Up</button>
+        </form>
+
+        <p class="mt-3 text-center">
+          Already have an account?
+          <a href="{{ url_for('login') }}">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+      new bootstrap.Alert(alert).close();
+    });
+  }, 5000);
+</script>
+
+</body>
+</html>

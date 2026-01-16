@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Orders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background: #f9fafb; }
+    .sidebar {
+      height: 100vh; background: #2e7d32; padding-top: 20px; color: white; position: fixed; width: 220px;
+    }
+    .sidebar a { color: white; text-decoration: none; padding: 12px 20px; display: block; font-weight: 500; }
+    .sidebar a:hover { background: #256428; border-radius: 5px; }
+    .content { margin-left: 240px; padding: 20px; }
+    .table th { background: #2e7d32; color: white; }
+    .status-attention { color: orange; font-weight: bold; }
+	.status-active { color: blue; font-weight: bold; }
+	.status-success { color: green; font-weight: bold; }
+	.status-danger { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h4 class="text-center mb-4">Admin Panel</h4>
+    <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+    <a href="{{ url_for('admin_view_orders') }}"><i class="fas fa-box me-2"></i> Orders</a>
+    <a href="{{ url_for('admin_inquiries') }}"><i class="fas fa-envelope me-2"></i> Messages</a>
+    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <h2 class="mb-4">Customer Orders</h2>
+
+    <!-- Search & Sort Form -->
+    <form method="GET" class="row g-3 mb-4">
+      <div class="col-md-4">
+        <input type="text" name="search" class="form-control" placeholder="Search by Order ID or Name" value="{{ search }}">
+      </div>
+      <div class="col-md-3">
+        <select name="sort" class="form-select">
+          <option value="date_desc" {% if sort=='date_desc' %}selected{% endif %}>Newest First</option>
+          <option value="date_asc" {% if sort=='date_asc' %}selected{% endif %}>Oldest First</option>
+          <option value="status" {% if sort=='status' %}selected{% endif %}>Status</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary" type="submit">Apply</button>
+      </div>
+    </form>
+
+    <!-- Pending / In-progress / Info Required Orders -->
+    <h4 class="mb-3">In-Progress Orders</h4>
+    {% set pending_orders = orders | selectattr('status', 'in',['PLACED', 'PAYMENT_PENDING', 'PREPARING', 'SHIPPED', 'DELAYED']) | list %}
+    {% if pending_orders %}
+      <div class="table-responsive mb-5">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Email</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in pending_orders %}
+            <tr>
+              <td>{{ order._id }}</td>
+              <td>{{ order.name }}</td>
+              <td>{{ order.email }}</td>
+              <td>₹{{ "%.2f"|format(order.total) }}</td>
+              <td>
+               
+			   {% if order.status in ['PLACED', 'PAYMENT_PENDING'] %}
+				  <span class="status-attention">{{ order.status }}</span>
+				{% elif order.status in ['PREPARING', 'SHIPPED'] %}
+				  <span class="status-active">{{ order.status }}</span>
+				{% elif order.status == 'DELAYED' %}
+				  <span class="status-danger">{{ order.status }}</span>
+				{% elif order.status in ['DELIVERED', 'REFUNDED'] %}
+				  <span class="status-success">{{ order.status }}</span>
+				{% elif order.status in ['CANCELLED', 'REFUND_INITIATED'] %}
+				  <span class="status-danger">{{ order.status }}</span>
+				{% endif %}
+			   
+              </td>
+              <td>{{ order.created_at }}</td>
+              <td>
+                <a href="{{ url_for('admin_view_order', order_id=order._id) }}" class="btn btn-sm btn-outline-primary">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-warning">No pending orders found.</div>
+    {% endif %}
+
+    <!-- Completed / Sent Orders -->
+    <h4 class="mb-3">Completed Orders</h4>
+    {% set completed_orders = orders | selectattr('status', 'in',  ['DELIVERED', 'REFUNDED', 'CANCELLED']) | list %}
+    {% if completed_orders %}
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Email</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in completed_orders %}
+            <tr>
+              <td>{{ order._id }}</td>
+              <td>{{ order.name }}</td>
+              <td>{{ order.email }}</td>
+              <td>₹{{ "%.2f"|format(order.total) }}</td>
+              <td>
+                <span class="status-completed">{{ order.status }}</span>
+              </td>
+              <td>{{ order.created_at }}</td>
+              <td>
+                <a href="{{ url_for('admin_view_order', order_id=order._id) }}" class="btn btn-sm btn-outline-primary">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-warning">No completed orders found.</div>
+    {% endif %}
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,583 @@
+/* ================================
+   GLOBAL SAFETY
+================================ */
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #fffdf5;
+    margin: 0;
+    padding-top: 0;
+}
+
+/* PAGE WRAPPER (FOR ALL PAGES) */
+.page-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* CONTAINER PADDING CONTROL */
+.container,
+.container-fluid {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* ================================
+   NAVBAR (FINAL STABLE VERSION)
+================================ */
+.navbar {
+    background-color: #2e7d32 !important;
+    padding: 12px 0;
+}
+
+.navbar .container {
+    flex-wrap: nowrap;
+}
+
+.navbar-collapse {
+    flex-grow: 1;
+}
+
+/* BRAND */
+.navbar-brand img {
+    height: 100px;
+    border-radius: 40px;
+}
+
+/* MAIN NAV LINKS */
+.main-nav {
+    flex-wrap: nowrap;
+}
+
+.main-nav .nav-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    margin: 0 10px;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+}
+
+.main-nav .nav-link i {
+    margin-right: 6px;
+    font-size: 1rem;
+}
+
+.main-nav .nav-link:hover {
+    color: #fbc02d !important;
+    transform: translateY(-2px);
+}
+
+/* USER AREA */
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.user-name {
+    color: #fbc02d;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* CART */
+.cart-btn {
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 0.7rem;
+}
+
+/* ================================
+   HEADER
+================================ */
+header {
+    text-align: center;
+    background-color: #d9534f;
+    color: white;
+    padding: 10px;
+}
+
+/* ================================
+   PRODUCT & CART
+================================ */
+#product-list,
+#cart {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.product {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    width: 150px;
+    text-align: center;
+}
+
+/* ================================
+   SEARCH BAR (ENHANCED UI)
+================================ */
+.products-container {
+    margin-top: 30px;
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-wrapper input {
+    border-radius: 50px;
+    padding: 14px 20px 14px 50px;
+    font-size: 1.05rem;
+    border: 1px solid #ddd;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.search-wrapper input:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 8px 22px rgba(46,125,50,0.3);
+    outline: none;
+}
+
+.search-wrapper .fa-search {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+/* SEARCH DROPDOWN */
+#searchResults {
+    max-height: 260px;
+    overflow-y: auto;
+    border-radius: 0 0 10px 10px;
+    display: none;
+    background: white;
+}
+
+#searchResults .list-group-item:hover {
+    background: #f8f9fa;
+}
+
+/* ================================
+   PRODUCT CARD DESIGN
+================================ */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0px 10px 24px rgba(0,0,0,0.18);
+}
+
+/* SELECT OPTIONS BUTTON */
+.btn-select {
+    background-color: #2e7d32;
+    color: white;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-select:hover {
+    background-color: #256428;
+    transform: scale(1.05);
+}
+
+/* CATEGORY TITLE */
+.category-title {
+    color: #2e7d32;
+    margin-top: 35px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* PRICE & RATING */
+.price-range {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.rating {
+    color: #fbc02d;
+    font-size: 0.9rem;
+}
+
+/* ================================
+   TIMELINE (ORDER STATUS)
+================================ */
+.timeline {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.timeline li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.timeline li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+}
+
+.timeline li.completed {
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.timeline li.completed::before {
+    background: #2e7d32;
+}
+
+.timeline li.active {
+    color: #0d6efd;
+    font-weight: 700;
+}
+
+.timeline li.active::before {
+    background: #0d6efd;
+}
+
+.timeline li.upcoming {
+    display: none;
+}
+
+/* ================================
+   FORM VALIDATION
+================================ */
+.was-validated .form-control:invalid {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.was-validated .form-control:valid {
+    border-color: #28a745;
+    background-color: #d4edda;
+}
+
+.invalid-feedback {
+    display: block;
+    font-size: 0.85rem;
+}
+
+/* PASSWORD STRENGTH */
+.strength-meter {
+    height: 5px;
+    border-radius: 3px;
+    margin-top: 2px;
+    transition: 0.3s ease;
+}
+
+.strength-meter.bg-secondary { background-color: #6c757d; }
+.strength-meter.bg-danger { background-color: #dc3545; }
+.strength-meter.bg-warning { background-color: #ffc107; }
+.strength-meter.bg-info { background-color: #17a2b8; }
+.strength-meter.bg-success { background-color: #28a745; }
+
+.strength-text {
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+.btn-green {
+    background: #2e7d32;
+    color: white;
+    transition: 0.3s ease;
+}
+
+.btn-green:hover {
+    background: #256428;
+}
+
+/* ================================
+   FLASH MESSAGE ANIMATION
+================================ */
+.flash-container {
+    position: fixed;
+    top: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+
+.login-wrapper {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  max-width: 420px;
+  width: 100%;
+  padding: 35px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.login-title {
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.login-subtitle {
+  font-size: 0.95rem;
+  color: #777;
+}
+
+.form-control {
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.form-control:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 0.15rem rgba(46,125,50,0.2);
+}
+
+.input-group-text {
+  background: #fffdf5;
+  border-radius: 12px 0 0 12px;
+}
+
+.btn-login {
+  background: linear-gradient(135deg, #2e7d32, #256428);
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 10px;
+}
+
+.btn-login:hover {
+  opacity: 0.95;
+}
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+.footer {
+    background: #198754;
+    color: white;
+    padding: 30px 10px 15px;
+    margin-top: 40px;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.footer-section h4 {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.footer-section a {
+    color: #e6f4ea;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    padding-top: 10px;
+}
+
+/* ================================
+   LEGAL PAGES
+================================ */
+.legal-page {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.legal-page h1 {
+    margin-bottom: 20px;
+}
+
+.flash-container {
+    max-width: 90%;
+    pointer-events: none;
+}
+
+.flash-container .alert {
+    pointer-events: auto;
+}
+
+.brand-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1.7rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #fbc02d;
+}
+
+/* 🐝 Flying Bee */
+.bee-container {
+    position: fixed;
+    top: 120px;
+    left: -80px;
+    z-index: 999;
+    pointer-events: none; /* 👈 IMPORTANT */
+}
+
+.bee {
+    width: 50px;
+    animation: flyAcross 18s linear infinite;
+}
+
+
+/* Horizontal flight */
+@keyframes flyAcross {
+    0% {
+        transform: translateX(-100px) translateY(0);
+    }
+    25% {
+        transform: translateX(30vw) translateY(-40px);
+    }
+    50% {
+        transform: translateX(60vw) translateY(20px);
+    }
+    75% {
+        transform: translateX(90vw) translateY(-30px);
+    }
+    100% {
+        transform: translateX(110vw) translateY(10px);
+    }
+}
+
+/* Wing flutter illusion */
+@keyframes wingFlap {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
+}
+
+@media (max-width: 576px) {
+  .bee-fly {
+    display: none;
+  }
+}
+
+.navbar-custom {
+  background: rgba(46, 125, 50, 0.95);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.logo-img {
+  height: 70px;
+  border-radius: 30px;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+.nav-animated {
+  position: relative;
+  font-weight: 500;
+}
+
+.nav-animated::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background-color: #fbc02d;
+  transition: width 0.3s ease;
+}
+
+.nav-animated:hover::after {
+  width: 100%;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  font-size: 0.7rem;
+  padding: 4px 6px;
+  border-radius: 50%;
+}
+
+.btn-cart {
+  background-color: #fbc02d;
+  border-radius: 20px;
+  font-weight: 600;
+  padding: 6px 14px;
+}
+
+.btn-cart:hover {
+  background-color: #f9a825;
+}

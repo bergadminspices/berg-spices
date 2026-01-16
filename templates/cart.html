@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Cart - BERG SPICES</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background: #fffdf5; }
+    .navbar { background: #2e7d32; }
+    .navbar-brand img { height: 100px; border-radius: 40px; }
+    .brand-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.76rem; color: #fbc02d; }
+    .navbar-quote { font-size: 0.9rem; font-style: italic; color: #fbc02d; }
+    .btn-success { background-color: #2e7d32 !important; border: none; }
+    .btn-success:hover { background-color: #256428 !important; }
+
+    .cart-table { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .cart-table thead { background: #f8f9fa; }
+    .cart-table tbody tr:hover { background: #fef7e0; transition: background 0.3s ease-in-out; }
+    .cart-img { height: 60px; border-radius: 8px; }
+
+    .quantity-controls { display: flex; align-items: center; gap: 5px; }
+    .quantity-controls button { width: 30px; height: 30px; border-radius: 6px; padding: 0; }
+    .quantity-controls input { width: 60px; text-align: center; }
+  </style>
+</head>
+<body>
+  {% include 'navbar.html' %}
+
+  <div class="container py-5">
+    <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h2>
+
+    <!-- Alerts -->
+    <div id="flash-messages">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    {% if cart|length == 0 %}
+      <div class="alert alert-warning">Your cart is empty.</div>
+      <a href="{{ url_for('home') }}" class="btn btn-success btn-lg mt-3">
+        <i class="fas fa-arrow-left"></i> Continue Shopping
+      </a>
+    {% else %}
+      <form action="{{ url_for('bulk_remove') }}" method="POST">
+        <div class="table-responsive">
+          <table class="table table-striped align-middle cart-table">
+            <thead>
+              <tr>
+                <th style="width:40px;"></th>
+                <th>Product</th>
+                <th>Packet</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart %}
+              <tr data-id="{{ item.id }}" data-packet="{{ item.packet }}">
+                <td>
+                  <input type="checkbox" name="selected_items" value="{{ item.id }}||{{ item.packet }}">
+                </td>
+                <td>
+                  <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" class="cart-img">
+                  <span class="ms-2">{{ item.name }}</span>
+                </td>
+                <td>{{ item.packet }}</td>
+                <td>
+                  <div class="d-flex quantity-controls">
+                    <button type="button" class="btn btn-outline-secondary btn-sm decrease"><i class="fas fa-minus"></i></button>
+                    <input type="number" class="form-control form-control-sm quantity-input" value="{{ item.quantity }}" min="1">
+                    <button type="button" class="btn btn-outline-secondary btn-sm increase"><i class="fas fa-plus"></i></button>
+                  </div>
+                </td>
+                <td>₹{{ "%.2f"|format(item.price) }}</td>
+                <td class="subtotal">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash-alt"></i> Remove Selected
+          </button>
+          <h4 class="text-end">Total: <span id="cart-total" class="text-success">₹{{ "%.2f"|format(total) }}</span></h4>
+        </div>
+      </form>
+
+      <div class="mt-4 d-flex gap-2">
+        <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg">
+          <i class="fas fa-credit-card"></i> Proceed to Checkout
+        </a>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
+          <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    function updateCartRow(row, quantity, subtotal, total) {
+      row.find('.quantity-input').val(quantity);
+      row.find('.subtotal').text('₹' + subtotal.toFixed(2));
+      $('#cart-total').text('₹' + total.toFixed(2));
+    }
+
+    $(document).ready(function(){
+      $('.increase, .decrease').click(function(){
+        let row = $(this).closest('tr');
+        let product_id = row.data('id');
+        let packet = row.data('packet');
+        let action = $(this).hasClass('increase') ? 'increase' : 'decrease';
+        let qtyInput = row.find('.quantity-input').val();
+
+        $.post(`/update_quantity_ajax/${product_id}`, {action: action, quantity: qtyInput, packet: packet}, function(response){
+          if(response.success){
+            updateCartRow(row, response.quantity, response.subtotal, response.total);
+          }
+        });
+      });
+
+      $('.quantity-input').change(function(){
+        let row = $(this).closest('tr');
+        let product_id = row.data('id');
+        let packet = row.data('packet');
+        let qty = $(this).val();
+
+        $.post(`/update_quantity_ajax/${product_id}`, {action: 'set', quantity: qty, packet: packet}, function(response){
+          if(response.success){
+            updateCartRow(row, response.quantity, response.subtotal, response.total);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

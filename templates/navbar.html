@@ -1,0 +1,118 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#2e7d32;">
+  <div class="container">
+
+    <!-- LOGO + BRAND -->
+    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+      <img src="{{ url_for('static', filename='logo.jpg') }}"
+           alt="BERG Spices Logo"
+           style="height:100px; border-radius:50px;">
+      <div class="ms-2">
+        <span class="brand-text">
+    BERG SPICES
+</span>
+<br>
+        <small class="text-light fst-italic">
+          "The taste of mountains"
+        </small>
+      </div>
+    </a>
+
+    <!-- TOGGLER -->
+    <button class="navbar-toggler" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- COLLAPSIBLE CONTENT -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+
+      <!-- CENTER NAVIGATION -->
+      <ul class="navbar-nav mx-auto align-items-center gap-0.5 main-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('home') }}">
+            <i class="fa-solid fa-house"></i> Home
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('about') }}">
+            <i class="fa-solid fa-circle-info"></i> About Us
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('contact') }}">
+            <i class="fa-solid fa-phone"></i> Contact
+          </a>
+        </li>
+
+        {% if session.get('user_id') and session.get('role') != 'admin' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('dashboard') }}">
+            <i class="fa-solid fa-box"></i> My Orders
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+
+      <!-- RIGHT USER ACTIONS -->
+      <div class="d-flex align-items-center gap-3 user-nav ms-auto">
+
+        {% if session.get('user_id') %}
+          <!-- USER NAME -->
+          <span class="user-name text-warning fw-semibold">
+            <i class="fa-solid fa-user-circle"></i>
+            {{ session.get('name') }}
+          </span>
+
+          <!-- PROFILE -->
+          <a href="{{ url_for('profile') }}"
+             class="btn btn-outline-light btn-sm">
+            Profile
+          </a>
+
+          <!-- LOGOUT -->
+          <a href="{{ url_for('logout') }}"
+             class="btn btn-outline-warning btn-sm">
+            Logout
+          </a>
+
+          <!-- ADMIN -->
+          {% if session.get('role') == 'admin' %}
+          <a href="{{ url_for('admin_dashboard') }}"
+             class="btn btn-warning btn-sm">
+            Admin
+          </a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('login') }}"
+             class="btn btn-outline-light btn-sm">
+            Login
+          </a>
+          <a href="{{ url_for('signup') }}"
+             class="btn btn-warning btn-sm">
+            Sign Up
+          </a>
+        {% endif %}
+
+        <!-- CART -->
+        <a href="{{ url_for('view_cart') }}"
+           class="btn btn-light btn-sm position-relative cart-btn">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="badge bg-danger cart-badge">
+            {{ cart_count or 0 }}
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

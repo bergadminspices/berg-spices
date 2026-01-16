@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Home | BERG SPICES {% endblock %}
+
+{% block content %}
+
+  <!-- ✅ Flash Messages -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show custom-flash" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+<div class="bee-container">
+    <img src="{{ url_for('static', filename='images/bee.png') }}" class="bee" alt="Flying Bee">
+</div>
+
+  <!-- ✅ Products Section -->
+  <div class="container products-container">
+
+    <!-- ✅ Live Search Box (NO form) -->
+    <div class="row mb-4">
+      <div class="col-md-6 mx-auto">
+        <div class="search-wrapper">
+			<i class="fas fa-search"></i>
+          <input class="form-control form-control-lg" id="searchInput" type="search" placeholder="Search spices...">
+          <div id="searchResults" class="list-group position-absolute w-100 shadow" style="top:100%; z-index:1000;"></div>
+        </div>
+      </div>
+    </div>
+
+    {% if categories %}
+      {% for category, items in categories.items() %}
+        <h3 class="category-title">{{ category }}</h3>
+        <div class="row g-4">
+          {% for product in items %}
+          <div class="col-md-3">
+            <div class="card h-100 text-center p-3">
+              <img src="{{ url_for('static', filename=product.image) }}" class="card-img-top mx-auto" style="max-height:200px; object-fit:contain;" alt="{{ product.name }}">
+              <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <div class="rating">★★★★★</div>
+
+                {% if product.price_options %}
+                  {% set prices = product.price_options | map(attribute='price') | list %}
+                  <p class="price-range">₹{{ prices|min }} – ₹{{ prices|max }}</p>
+                {% else %}
+                  <p class="price-range text-muted">Price not available</p>
+                {% endif %}
+
+                <p class="text-muted small">{{ product.description }}</p>
+                <a href="{{ url_for('product_detail', product_id=product['_id']) }}" class="btn btn-select w-100 mt-2">Select Options 
+				</a>				
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-warning mt-4">No products available right now.</div>
+    {% endif %}
+
+    <div class="text-end mt-4">
+      <a href="{{ url_for('checkout') }}" class="btn btn-lg btn-success">Proceed to Checkout</a>
+    </div>
+  </div>
+
+  <script>
+  // ✅ Auto dismiss flash messages
+  setTimeout(() => {
+    document.querySelectorAll('.custom-flash').forEach(el => el.classList.remove('show'));
+  }, 3000);
+
+  // ✅ Live search with "no results" + "view all"
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    const searchResults = document.getElementById("searchResults");
+
+    if (searchInput) {
+      searchInput.addEventListener("input", function () {
+        let query = this.value.trim();
+        if (query.length < 2) {
+          searchResults.style.display = "none";
+          return;
+        }
+
+        fetch(`/live_search?q=${encodeURIComponent(query)}`)
+          .then(res => res.json())
+          .then(data => {
+            searchResults.innerHTML = "";
+            if (data.length === 0) {
+              searchResults.innerHTML = `<div class="list-group-item no-results">No results found</div>`;
+              searchResults.style.display = "block";
+              return;
+            }
+
+            let limited = data.slice(0, 5);
+            limited.forEach(item => {
+              let div = document.createElement("a");
+              div.href = `/product/${item._id}`;
+              div.classList.add("list-group-item", "list-group-item-action");
+              div.innerHTML = `
+                <div class="d-flex align-items-center">
+                  <img src="/static/${item.image}" alt="${item.name}" width="60" class="me-2 rounded">
+                  <span>${item.name}</span>
+                </div>`;
+              searchResults.appendChild(div);
+            });
+
+            if (data.length > 5) {
+              let viewAll = document.createElement("a");
+              viewAll.href = `/search?q=${encodeURIComponent(query)}`;
+              viewAll.classList.add("list-group-item", "view-all");
+              viewAll.textContent = `View all results (${data.length})`;
+              searchResults.appendChild(viewAll);
+            }
+
+            searchResults.style.display = "block";
+          })
+          .catch(err => console.error(err));
+      });
+
+      document.addEventListener("click", function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.style.display = "none";
+        }
+      });
+    }
+  });
+  </script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const bee = document.querySelector(".bee-fly");
+    if (bee) {
+      bee.style.animationDelay = `-${Math.random() * 10}s`;
+    }
+  });
+</script>
+{% endblock %}

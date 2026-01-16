@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Customer Messages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background: #f9fafb; }
+    .sidebar {
+      height: 100vh; background: #2e7d32; padding-top: 20px; color: white; position: fixed; width: 220px;
+    }
+    .sidebar a { color: white; text-decoration: none; padding: 12px 20px; display: block; font-weight: 500; }
+    .sidebar a:hover { background: #256428; border-radius: 5px; }
+    .content { margin-left: 240px; padding: 20px; }
+    .table th { background: #2e7d32; color: white; }
+    .badge-unread { background-color: #ff9800; }
+    .badge-read { background-color: #4caf50; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h4 class="text-center mb-4">Admin Panel</h4>
+    <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+    <a href="{{ url_for('admin_view_orders') }}"><i class="fas fa-box me-2"></i> Orders</a>
+    <a href="{{ url_for('admin_inquiries') }}"><i class="fas fa-envelope me-2"></i> Messages</a>
+    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+  </div>
+
+  <div class="content">
+    <h2 class="mb-4">Customer Messages</h2>
+
+    <ul class="nav nav-tabs mb-3" id="messageTabs">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#unread">Unread ({{ unread|length }})</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#read">Read ({{ read|length }})</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="unread" class="tab-pane fade show active">
+        {% if unread %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle">
+            <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              {% for inquiry in unread %}
+              <tr>
+                <td>{{ inquiry.name }}</td>
+                <td>{{ inquiry.email }}</td>
+                <td>{{ inquiry.message[:50] }}{% if inquiry.message|length > 50 %}...{% endif %}</td>
+                <td>{{ inquiry.created_at if inquiry.created_at is string else inquiry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td><span class="badge badge-unread">Unread</span></td>
+                <td>
+                  <a href="{{ url_for('admin_view_inquiry', inquiry_id=inquiry._id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                  <form action="{{ url_for('admin_delete_inquiry', inquiry_id=inquiry._id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div class="alert alert-warning">No unread messages.</div>
+        {% endif %}
+      </div>
+
+      <div id="read" class="tab-pane fade">
+        {% if read %}
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle">
+            <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              {% for inquiry in read %}
+              <tr>
+                <td>{{ inquiry.name }}</td>
+                <td>{{ inquiry.email }}</td>
+                <td>{{ inquiry.message[:50] }}{% if inquiry.message|length > 50 %}...{% endif %}</td>
+                <td>{{ inquiry.created_at if inquiry.created_at is string else inquiry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td><span class="badge badge-read">Read</span></td>
+                <td>
+                  <a href="{{ url_for('admin_view_inquiry', inquiry_id=inquiry._id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                  <form action="{{ url_for('admin_delete_inquiry', inquiry_id=inquiry._id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div class="alert alert-warning">No read messages.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

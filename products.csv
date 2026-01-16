@@ -1,0 +1,8 @@
+sku,name,image,description,category,price_options
+SPC001,Cardamom 8mm,cardamom.jpg,Aromatic green cardamom 8mm.,Whole Spices,"[{'label': '250gm', 'price': 990}, {'label': '500gm', 'price': 1950}, {'label': '1kg', 'price': 3800}]"
+SPC002,Cardamom 6mm,cardamom6mm.jpg,Aromatic green cardamom 6mm.,Whole Spices,"[{'label': '250gm', 'price': 780}, {'label': '500gm', 'price': 1550}, {'label': '1kg', 'price': 3000}]"
+SPC003,Black Pepper,black_pepper.jpg,Premium quality black pepper.,Whole Spices,"[{'label': '250gm', 'price': 190}, {'label': '500gm', 'price': 360}, {'label': '1kg', 'price': 700}]"
+SPC004,Butterfly Pea,Sangu Pushpam.jpg,"Pure Sangu Pushpam, naturally vibrant & beneficial.",Whole Spices,"[{'label': '25 nos.', 'price': 200}, {'label': '50 nos.', 'price': 350}, {'label': '100 nos.', 'price': 750}]"
+SPC005,Cloves,Clove.jpg,"Aromatic clove buds with a warm, spicy flavor.",Whole Spices,"[{'label': '250gm', 'price': 240}, {'label': '250gm', 'price': 550}, {'label': '1kg', 'price': 1000}]"
+SPC006,Garcinia cambogia,kudampuli.jpg,"Natural Garcinia Cambogia, known for its health benefits.",Whole Spices,"[{'label': '100gm', 'price': 230}, {'label': '250gm', 'price': 580}, {'label': '500gm', 'price': 1150}]"
+SPC007,Honey,Honey.jpg,"Golden, natural honey with a rich, sweet flavor.",Whole Spices,"[{'label': '250gm', 'price': 160}, {'label': '500gm', 'price': 320}, {'label': '1kg', 'price': 600}]"
