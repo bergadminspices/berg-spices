@@ -67,7 +67,7 @@
         <!-- Remove from Cart button (only if already in cart) -->
         {% if product_in_cart %}
         <form action="{{ url_for('remove_from_cart', product_id=product['_id']) }}" method="POST" class="mt-3">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn btn-danger btn-lg">Remove from Cart</button>
         </form>
         {% endif %}
