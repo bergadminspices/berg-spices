@@ -57,12 +57,10 @@
       <div class="checkout-card">
         <h4>Billing Information</h4>
 
-        <form method="post"
-			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              action="{{ url_for('place_order') }}"
+        <form method="post" action="{{ url_for('place_order') }}"
               class="needs-validation"
               novalidate>
-
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <!-- Full Name -->
           <div class="mb-3">
             <label class="form-label">Full Name</label>
