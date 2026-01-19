@@ -656,22 +656,6 @@ header {
   color: white;
   padding-top: 20px;
 }
-
-/* DESKTOP FIX */
-@media (min-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 220px;
-    height: 100vh;
-  }
-
-  .content {
-    margin-left: 220px;
-  }
-}
-
 /* MOBILE */
 .content {
   padding: 20px;
@@ -700,4 +684,27 @@ header {
 
 .admin-navbar .navbar-toggler-icon {
   filter: invert(1);
+}
+
+/* ================================
+   ADMIN DASHBOARD – DESKTOP LAYOUT
+================================ */
+@media (min-width: 768px) {
+  .admin-layout {
+    display: flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    z-index: 1040;
+  }
+
+  .content {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
 }
