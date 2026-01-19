@@ -627,4 +627,22 @@ header {
     font-size: 1.3rem;
   }
 }
+/* ================================
+   CART BUTTON – MOBILE POLISH
+================================ */
+@media (max-width: 576px) {
+
+  .cart-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .cart-badge {
+    top: -4px;
+    right: -4px;
+    font-size: 0.65rem;
+    padding: 3px 5px;
+  }
+
+}
 
