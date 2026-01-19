@@ -581,3 +581,50 @@ header {
 .btn-cart:hover {
   background-color: #f9a825;
 }
+
+       /* ================================
+   MOBILE NAVBAR FIX
+================================ */
+@media (max-width: 991px) {
+
+  .navbar .container {
+    flex-wrap: wrap !important;
+  }
+
+  .navbar-collapse {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .main-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .main-nav .nav-item {
+    width: 100%;
+    text-align: center;
+  }
+
+  .user-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .user-name {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navbar-brand img {
+    height: 70px;
+  }
+
+  .brand-text {
+    font-size: 1.3rem;
+  }
+}
+
