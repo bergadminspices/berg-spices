@@ -12,6 +12,35 @@ body {
     margin: 0;
     padding-top: 0;
 }
+/* ================================
+   GLOBAL MOBILE BASELINE
+================================ */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1, h2, h3, h4, h5 {
+  word-wrap: break-word;
+}
+
+p {
+  line-height: 1.6;
+}
+
+@media (max-width: 576px) {
+  .card {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-card {
+    padding: 25px;
+    margin: 10px;
+  }
+}
+
 
 /* PAGE WRAPPER (FOR ALL PAGES) */
 .page-wrapper {
@@ -23,9 +52,15 @@ body {
 /* CONTAINER PADDING CONTROL */
 .container,
 .container-fluid {
+	width: 100%;
     padding-left: 12px;
     padding-right: 12px;
 }
+
+* {
+  max-width: 100%;
+}
+
 
 /* ================================
    NAVBAR (FINAL STABLE VERSION)
@@ -748,5 +783,48 @@ header {
 
   .footer-bottom {
     font-size: 12px;
+  }
+}
+/* ================================
+   GLOBAL MOBILE LAYOUT FIX
+================================ */
+@media (max-width: 768px) {
+
+  /* Page spacing */
+  body {
+    font-size: 15px;
+  }
+
+  section {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Cards & grids */
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .col,
+  [class^="col-"] {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  /* Forms */
+  .form-control {
+    font-size: 15px;
+  }
+
+  /* Tables */
+  table {
+    font-size: 14px;
   }
 }
