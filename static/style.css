@@ -57,11 +57,6 @@ p {
     padding-right: 12px;
 }
 
-* {
-  max-width: 100%;
-}
-
-
 /* ================================
    NAVBAR (FINAL STABLE VERSION)
 ================================ */
@@ -78,24 +73,24 @@ p {
     flex-grow: 1;
 }
 
-/* BRAND */
-.navbar-brand img {
-    height: 100px;
-    border-radius: 40px;
-}
-
 /* MAIN NAV LINKS */
 .main-nav {
     flex-wrap: nowrap;
 }
 
 .main-nav .nav-link {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #ffffff !important;
-    margin: 0 10px;
-    white-space: nowrap;
-    transition: all 0.25s ease;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  margin: 0 10px;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.main-nav .nav-link:hover {
+  background: rgba(255,255,255,0.08);
 }
 
 .main-nav .nav-link i {
@@ -110,10 +105,9 @@ p {
 
 /* USER AREA */
 .user-nav {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .user-name {
@@ -132,12 +126,50 @@ p {
     justify-content: center;
 }
 
-.cart-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    font-size: 0.7rem;
+/* ================================
+   NAVBAR DESKTOP ALIGNMENT FIX
+================================ */
+@media (min-width: 992px) {
+
+  .navbar .container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 24px;
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 340px;
+  }
+
+  .navbar-collapse {
+    display: flex !important;
+    justify-content: center;
+  }
+
+  .main-nav {
+    display: flex;
+    gap: 22px;
+  }
+
+  .user-nav {
+    justify-self: end;
+    flex-shrink: 0;
+  }
 }
+
+.brand-text {
+  white-space: nowrap;
+}
+
+.navbar-brand small,
+.navbar-brand p {
+  white-space: nowrap;
+}
+
 
 /* ================================
    HEADER
@@ -495,21 +527,22 @@ header {
     margin-bottom: 20px;
 }
 
-.flash-container {
-    max-width: 90%;
-    pointer-events: none;
-}
-
 .flash-container .alert {
     pointer-events: auto;
 }
 
 .brand-text {
     font-family: 'Cinzel', serif;
-    font-size: 1.7rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: #fbc02d;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+	line-height: 1.1;
+	color: #fbc02d;
+}
+
+.navbar-brand small {
+  font-size: 0.85rem;
+  line-height: 1;
 }
 
 /* 🐝 Flying Bee */
@@ -553,10 +586,11 @@ header {
 }
 
 @media (max-width: 576px) {
-  .bee-fly {
+  .bee {
     display: none;
   }
 }
+
 
 .navbar-custom {
   background: rgba(46, 125, 50, 0.95);
@@ -565,9 +599,12 @@ header {
 }
 
 .logo-img {
-  height: 70px;
-  border-radius: 30px;
+  height: 72px;          /* desktop */
+  width: auto;
+  border-radius: 36px;
+  flex-shrink: 0;
 }
+
 
 .navbar-toggler {
   border: none;
@@ -670,13 +707,6 @@ header {
   .cart-btn {
     width: 38px;
     height: 38px;
-  }
-
-  .cart-badge {
-    top: -4px;
-    right: -4px;
-    font-size: 0.65rem;
-    padding: 3px 5px;
   }
 
 }
@@ -813,9 +843,9 @@ header {
   }
 
   /* Buttons */
-  .btn {
-    width: 100%;
-    margin-bottom: 10px;
+ .btn:not(.btn-icon):not(.btn-sm) {
+  width: 100%;
+  margin-bottom: 10px;
   }
 
   /* Forms */
