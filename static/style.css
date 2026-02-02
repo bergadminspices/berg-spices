@@ -7,13 +7,6 @@
   padding: 14px 0;
 }
 
-.navbar .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-}
-
 @media (min-width: 992px) {
   .navbar-brand {
     max-width: 340px;
@@ -147,6 +140,16 @@ p {
   }
 }
 
+@media (min-width: 992px) {
+  .navbar .navbar-collapse {
+    align-items: center;
+  }
+
+  .user-nav {
+    white-space: nowrap;
+  }
+}
+
 
 /* PAGE WRAPPER (FOR ALL PAGES) */
 .page-wrapper {
@@ -154,13 +157,9 @@ p {
     max-width: 100%;
     overflow-x: hidden;
 }
-
-/* CONTAINER PADDING CONTROL */
-.container,
-.container-fluid {
-	width: 100%;
-    padding-left: 12px;
-    padding-right: 12px;
+.page-wrapper > .container {
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .user-name {
