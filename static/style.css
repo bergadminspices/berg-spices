@@ -36,7 +36,7 @@
 .brand-text {
   font-family: 'Playfair Display', serif;
   font-weight: 700;
-  font-size: 1.76rem;
+  font-size: 1.76rem; 
   line-height: 1.2;
   color: #fbc02d;
   white-space: nowrap;
@@ -51,7 +51,7 @@
 /* NAV LINKS */
 .nav-link {
   color: white !important;
-  font-weight: 500;
+  font-weight: 300;
   margin: 0 10px;
 }
 
@@ -63,7 +63,7 @@
 .btn-cart {
   background-color: #fbc02d;
   color: black !important;
-  border-radius: 20px;
+  border-radius: 15px;
   padding: 6px 14px;
   font-weight: 600;
 }
