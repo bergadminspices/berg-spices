@@ -8,58 +8,130 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
   <style>
-    body { background: #f9fafb; }
-    .sidebar {
-      height: 100vh;
-      background: #2e7d32;
-      padding-top: 20px;
-      color: white;
-    }
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      padding: 12px 20px;
-      display: block;
-      font-weight: 500;
-    }
-    .sidebar a:hover {
-      background: #256428;
-      border-radius: 5px;
-    }
-    .content {
-      padding: 20px;
-    }
-    .card {
-      border-radius: 15px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-      transition: transform 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
-		.admin-layout {
-	  min-height: 100vh;
-	}
+    /* ================================
+   ADMIN DASHBOARD – VISUAL POLISH
+================================ */
 
-	@media (min-width: 768px) {
-	  .offcanvas-md {
-		position: static;
-		transform: none !important;
-		visibility: visible !important;
-	  }
+body {
+  background: linear-gradient(180deg, #f4f6f9, #eef2f6);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-	  .admin-layout {
-		display: flex;
-		align-items: stretch;
-	  }
-
-	  .content {
-		margin-left: 240px;
-		padding-top: 20px;
-	  }
-	}
-	.admin-layout {
+/* Layout */
+.admin-layout {
   min-height: 100vh;
+}
+
+/* ================================
+   SIDEBAR
+================================ */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #2e7d32, #256428);
+  padding-top: 24px;
+  color: white;
+  box-shadow: 4px 0 16px rgba(0,0,0,0.12);
+}
+
+.sidebar h4 {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.sidebar a {
+  color: rgba(255,255,255,0.95);
+  text-decoration: none;
+  padding: 12px 20px;
+  margin: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ================================
+   CONTENT AREA
+================================ */
+.content {
+  flex: 1;
+  padding: 28px;
+}
+
+.content h2 {
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+/* ================================
+   CARDS
+================================ */
+.card {
+  border: none;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+}
+
+/* Stat icons */
+.card i {
+  opacity: 0.9;
+}
+
+/* ================================
+   QUICK ACTION CARDS
+================================ */
+.quick-card {
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+.quick-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.15);
+}
+
+/* ================================
+   MOBILE NAVBAR
+================================ */
+.navbar {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ================================
+   RESPONSIVE FIXES
+================================ */
+@media (min-width: 768px) {
+  .offcanvas-md {
+    position: static;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .admin-layout {
+    display: flex;
+  }
+
+  .content {
+    margin-left: 240px;
+  }
+}
+
+@media (max-width: 767px) {
+  .content {
+    padding: 20px;
+  }
 }
   </style>
 </head>
