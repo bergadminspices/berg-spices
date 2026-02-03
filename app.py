@@ -1735,7 +1735,10 @@ def logout():
     flash("Logged out.", "info")
     return redirect(url_for("home"))
 
-
+@app.before_request
+def debug_csrf():
+    if request.method == "POST":
+        print("POST request to:", request.path)
 # -------------------------
 # Run app
 # -------------------------
