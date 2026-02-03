@@ -1,6 +1,23 @@
 /* ================================
    GLOBAL NAVBAR – MASTER (ABOUT STYLE)
 ================================ */
+/* FIX: Prevent navbar links from wrapping */
+@media (min-width: 992px) {
+  .navbar-nav .nav-link {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+/* FIX: Normalize cart button shape across all pages */
+.cart-btn {
+  border-radius: 20px !important;
+  width: auto;
+  height: auto;
+  padding: 6px 14px;
+}
 
 .navbar {
   background-color: #2e7d32;
@@ -43,9 +60,17 @@
 }
 
 .navbar-quote {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   font-style: italic;
   color: #fbc02d;
+  line-height: 1.2;
+}
+
+/* Desktop enhancement */
+@media (min-width: 992px) {
+  .navbar-quote {
+    font-size: 1.1rem;
+  }
 }
 
 /* NAV LINKS */
@@ -63,7 +88,7 @@
 .btn-cart {
   background-color: #fbc02d;
   color: black !important;
-  border-radius: 15px;
+  border-radius: 20px; 
   padding: 6px 14px;
   font-weight: 600;
 }
@@ -166,16 +191,6 @@ p {
     color: #fbc02d;
     font-weight: 600;
     white-space: nowrap;
-}
-
-/* CART */
-.cart-btn {
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .navbar-brand small,
