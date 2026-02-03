@@ -97,11 +97,17 @@
       <!-- REPLY INPUT -->
       <div class="reply-box">
         <form action="{{ url_for('reply_to_admin', inquiry_id=inquiry._id) }}" method="POST">
-          <div class="input-group">
-            <input type="text" name="reply_message" class="form-control" placeholder="Write a message..." required>
-            <button class="btn btn-success">Send</button>
-          </div>
-        </form>
+		  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+		  <div class="input-group">
+			<input type="text"
+				   name="reply_message"
+				   class="form-control"
+				   placeholder="Write a message..."
+				   required>
+			<button class="btn btn-success">Send</button>
+		  </div>
+		</form>
       </div>
 
     {% endfor %}
