@@ -211,16 +211,25 @@
         </div>
 
         <!-- REPLY FORM -->
-        <form method="POST" action="{{ url_for('admin_reply_inquiry', inquiry_id=inquiry._id) }}">
-          <div class="mb-2">
-            <label class="form-label fw-semibold">Reply to customer</label>
-            <textarea name="reply_message" class="form-control" rows="3" required></textarea>
-          </div>
-          <div class="d-flex justify-content-end gap-2">
-            <button class="btn btn-success">Send Reply</button>
-            <a href="{{ url_for('admin_inquiries') }}" class="btn btn-outline-secondary">Close</a>
-          </div>
-        </form>
+        <form method="POST"
+			  action="{{ url_for('admin_reply_inquiry', inquiry_id=inquiry._id) }}">
+		  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+		  <div class="mb-2">
+			<label class="form-label fw-semibold">Reply to customer</label>
+			<textarea name="reply_message"
+					  class="form-control"
+					  rows="3"
+					  required></textarea>
+		  </div>
+
+		  <div class="d-flex justify-content-end gap-2">
+			<button class="btn btn-success">Send Reply</button>
+			<a href="{{ url_for('admin_inquiries') }}"
+			   class="btn btn-outline-secondary">Close</a>
+		  </div>
+		</form>
+
 
       </div>
     </div>
