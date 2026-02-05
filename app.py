@@ -35,6 +35,23 @@ from datetime import timedelta
 #import razorpay razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 import re
 from flask_wtf.csrf import CSRFProtect
+import razorpay
+from razorpay.errors import SignatureVerificationError
+import hmac
+import hashlib
+import json
+
+
+RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET")
+
+razorpay_client = razorpay.Client(
+    auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
+)
+
+if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
+    raise RuntimeError("Razorpay keys not configured")
+    
 
 def format_dt(dt):
     if isinstance(dt, datetime):
@@ -119,6 +136,11 @@ products_col = db['products']
 orders_col = db['orders']
 users_col = db['users']
 messages_col = db['messages']  # will store contact inquiries and replies
+# ---- MongoDB Indexes (safe on redeploy) ----
+orders_col.create_index("payment.razorpay_order_id")
+orders_col.create_index("payment.transaction_id")
+orders_col.create_index("created_at")
+
 # -------------------------
 # MongoDB Indexes (run once)
 # -------------------------
@@ -266,6 +288,133 @@ def sync_products_from_csv():
 
 # Run sync on startup
 # sync_products_from_csv()
+
+#------------------------
+#---Razore Pay
+#------------------------
+@csrf.exempt
+@app.route("/create_razorpay_order", methods=["POST"])
+def create_razorpay_order():
+    cart = session.get("cart", [])
+    if not cart:
+        return jsonify({"error": "Cart empty"}), 400
+
+    amount = int(sum(item["price"] * item["quantity"] for item in cart) * 100)
+
+    order = razorpay_client.order.create({
+    "amount": amount,
+    "currency": "INR",
+    "payment_capture": 1
+})
+
+orders_col.insert_one({
+    "order_id": str(uuid.uuid4())[:8].upper(),
+    "payment": {
+        "method": "ONLINE",
+        "status": "CREATED",
+        "razorpay_order_id": order["id"]
+    },
+    "status": "PAYMENT_PENDING",
+    "created_at": datetime.now(),
+    "updated_at": datetime.now()
+})
+
+return jsonify(order)
+
+    
+@csrf.exempt
+@app.route("/razorpay/webhook", methods=["POST"])
+def razorpay_webhook():
+    webhook_secret = os.environ.get("RAZORPAY_WEBHOOK_SECRET")
+
+    payload = request.data
+    received_signature = request.headers.get("X-Razorpay-Signature")
+
+    if not webhook_secret or not received_signature:
+        return "Invalid webhook", 400
+
+    # ---- Verify signature ----
+    expected_signature = hmac.new(
+        webhook_secret.encode(),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(expected_signature, received_signature):
+        return "Signature verification failed", 400
+
+    event = json.loads(payload)
+
+    event_type = event.get("event")
+    entity = event.get("payload", {}).get("payment", {}).get("entity", {})
+
+    razorpay_payment_id = entity.get("id")
+    razorpay_order_id = entity.get("order_id")
+
+    # ---- PAYMENT CAPTURED ----
+    if event_type == "payment.captured":
+        orders_col.update_one(
+            {"payment.razorpay_order_id": razorpay_order_id},
+            {
+                "$set": {
+                    "payment.status": "PAID",
+                    "payment.transaction_id": razorpay_payment_id,
+                    "status": "PLACED",
+                    "updated_at": datetime.now()
+                },
+                "$push": {
+                    "status_history": {
+                        "status": "PAID",
+                        "timestamp": datetime.now()
+                    }
+                }
+            }
+        )
+
+    # ---- PAYMENT FAILED ----
+    elif event_type == "payment.failed":
+        orders_col.update_one(
+            {"payment.razorpay_order_id": razorpay_order_id},
+            {
+                "$set": {
+                    "payment.status": "FAILED",
+                    "status": "PAYMENT_FAILED",
+                    "updated_at": datetime.now()
+                },
+                "$push": {
+                    "status_history": {
+                        "status": "PAYMENT_FAILED",
+                        "timestamp": datetime.now()
+                    }
+                }
+            }
+        )
+
+    # ---- REFUND PROCESSED ----
+    elif event_type == "refund.processed":
+        refund = event.get("payload", {}).get("refund", {}).get("entity", {})
+        refund_id = refund.get("id")
+
+        orders_col.update_one(
+            {"payment.transaction_id": refund.get("payment_id")},
+            {
+                "$set": {
+                    "payment.status": "REFUNDED",
+                    "status": "REFUNDED",
+                    "refund_id": refund_id,
+                    "updated_at": datetime.now()
+                },
+                "$push": {
+                    "status_history": {
+                        "status": "REFUNDED",
+                        "timestamp": datetime.now()
+                    }
+                }
+            }
+        )
+
+    return "OK", 200
+
 
 # Admin-triggered manual sync
 @app.route("/admin/sync-products")
@@ -589,16 +738,44 @@ def place_order():
         })
 
     total_amount = sum(i["subtotal"] for i in items)
-
     payment_method = (payment_method or "").upper()
 
-    if payment_method == "COD":
-        order_status = "PLACED"
-        payment_status = "COD"
-    else:
-        order_status = "PAYMENT_PENDING"
-        payment_status = "PENDING"
+    rp_order_id = None
+    transaction_id = None
 
+    # ---------------- PAYMENT HANDLING ----------------
+    if payment_method == "COD":
+        payment_status = "COD"
+        order_status = "PLACED"
+
+    elif payment_method == "ONLINE":
+        rp_payment_id = request.form.get("razorpay_payment_id")
+        rp_order_id = request.form.get("razorpay_order_id")
+        rp_signature = request.form.get("razorpay_signature")
+
+        if not all([rp_payment_id, rp_order_id, rp_signature]):
+            flash("Payment details missing", "danger")
+            return redirect(url_for("checkout"))
+
+        try:
+            razorpay_client.utility.verify_payment_signature({
+                "razorpay_order_id": rp_order_id,
+                "razorpay_payment_id": rp_payment_id,
+                "razorpay_signature": rp_signature
+            })
+            payment_status = "PAID"
+            order_status = "PLACED"
+            transaction_id = rp_payment_id
+
+        except SignatureVerificationError:
+            flash("Payment verification failed", "danger")
+            return redirect(url_for("checkout"))
+
+    else:
+        flash("Invalid payment method", "danger")
+        return redirect(url_for("checkout"))
+
+    # ---------------- CREATE ORDER ----------------
     order = {
         "order_id": str(uuid.uuid4())[:8].upper(),
         "name": name,
@@ -610,7 +787,8 @@ def place_order():
         "payment": {
             "method": payment_method,
             "status": payment_status,
-            "transaction_id": None
+            "transaction_id": transaction_id,
+            "razorpay_order_id": rp_order_id
         },
         "status": order_status,
         "created_at": datetime.now(),
@@ -624,6 +802,7 @@ def place_order():
 
     orders_col.insert_one(order)
     session["cart"] = []
+
     flash("Order placed!", "success")
     return redirect(url_for("thank_you", order_id=order["order_id"]))
 
@@ -1735,10 +1914,7 @@ def logout():
     flash("Logged out.", "info")
     return redirect(url_for("home"))
 
-@app.before_request
-def debug_csrf():
-    if request.method == "POST":
-        print("POST request to:", request.path)
+
 # -------------------------
 # Run app
 # -------------------------
