@@ -9,3 +9,4 @@ itsdangerous==2.1.2
 xhtml2pdf==0.2.11
 gunicorn==21.2.0
 razorpay==1.4.2
+setuptools>=68.0.0
