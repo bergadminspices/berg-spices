@@ -57,10 +57,16 @@
       <div class="checkout-card">
         <h4>Billing Information</h4>
 
-        <form method="post" action="{{ url_for('place_order') }}"
-              class="needs-validation"
-              novalidate>
+        <form id="checkoutForm"
+		  method="post"
+		  action="{{ url_for('place_order') }}"
+		  class="needs-validation"
+		  novalidate>
 			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+				<input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+				<input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+				<input type="hidden" name="razorpay_signature" id="razorpay_signature">
+
           <!-- Full Name -->
           <div class="mb-3">
             <label class="form-label">Full Name</label>
@@ -112,22 +118,30 @@
           </div>
 
           <!-- Payment Method -->
-          <div class="mb-3">
-            <label class="form-label">Payment Method</label>
-            <select class="form-select" name="payment" required>
-              <option value="">Select Payment Method</option>
-              <option value="COD">Cash on Delivery</option>
-              <option value="UPI" disabled>UPI (Coming Soon)</option>
-              <option value="CARD" disabled>Card (Coming Soon)</option>
-            </select>
-            <div class="invalid-feedback">
-              Please select a payment method.
-            </div>
-          </div>
+            <div class="mb-3">
+			  <label class="form-label">Payment Method</label>
 
-          <button type="submit" class="btn btn-success btn-lg">
-            Place Order
-          </button>
+			  <div class="form-check">
+				<input class="form-check-input" type="radio" name="payment" value="COD" checked required>
+				<label class="form-check-label">Cash on Delivery</label>
+			  </div>
+
+			  <div class="form-check">
+				<input class="form-check-input" type="radio" name="payment" value="ONLINE" required>
+				<label class="form-check-label">UPI / Card / NetBanking</label>
+			  </div>
+
+			  <div class="invalid-feedback">
+				Please select a payment method.
+			  </div>	
+			</div>
+
+          <button type="submit"
+				id="placeOrderBtn"
+				class="btn btn-success btn-lg">
+		  Place Order
+		</button>
+
 
         </form>
       </div>
@@ -185,7 +199,61 @@
 })()
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById("placeOrderBtn").addEventListener("click", async function (e) {
+    const form = document.getElementById("checkoutForm");
+    const btn = document.getElementById("placeOrderBtn");
 
+    if (!form.checkValidity()) {
+        form.classList.add("was-validated");
+        return;
+    }
+
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+    if (paymentMethod === "ONLINE") {
+        e.preventDefault();
+        btn.disabled = true;
+
+        const res = await fetch("/create_razorpay_order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token() }}"
+            }
+        });
+
+        const data = await res.json();
+
+        const options = {
+            key: data.key,
+            amount: data.amount,
+            currency: "INR",
+            name: "BERG SPICES",
+            description: "Order Payment",
+            order_id: data.order_id,
+
+            handler: function (response) {
+                document.getElementById("razorpay_payment_id").value = response.razorpay_payment_id;
+                document.getElementById("razorpay_order_id").value = response.razorpay_order_id;
+                document.getElementById("razorpay_signature").value = response.razorpay_signature;
+                form.submit();
+            },
+
+            modal: {
+                ondismiss: function () {
+                    btn.disabled = false;
+                }
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>
