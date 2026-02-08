@@ -816,3 +816,82 @@ header {
     font-size: 14px;
   }
 }
+
+.main-footer{
+    background:#f3f3f3;
+    padding:40px 15px;
+}
+
+/* rounded green tab */
+.footer-box{
+    background:#2e7d32;
+    color:#fff;
+    max-width:1200px;
+    margin:auto;
+    border-radius:22px;
+    padding:40px 30px 20px;
+}
+
+/* FORCE ROW LAYOUT */
+.footer-row{
+    display:flex !important;
+    flex-wrap:wrap;
+    gap:30px;
+}
+
+.footer-col{
+    flex:1;
+    min-width:220px;
+}
+
+.footer-wide{
+    flex:1.8;
+}
+
+.footer-col a{
+    display:block;
+    color:#e8f5e9;
+    text-decoration:none;
+    margin-bottom:6px;
+}
+
+/* social buttons */
+.footer-social{
+    display:flex;
+    gap:12px;
+}
+
+.footer-social a{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+}
+
+.ig{
+    background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7);
+}
+
+.fb{
+    background:#1877f2;
+}
+
+/* fssai */
+.fssai{
+    width:110px;
+    background:#fff;
+    padding:6px;
+    border-radius:8px;
+    margin-bottom:8px;
+}
+
+.footer-copy{
+    text-align:center;
+    margin-top:25px;
+    padding-top:15px;
+    border-top:1px solid rgba(255,255,255,0.2);
+    font-size:13px;
+}
