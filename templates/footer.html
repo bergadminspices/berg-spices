@@ -1,20 +1,22 @@
 <footer class="footer">
-
     <div class="footer-container">
 
-        <!-- Contact -->
-        <div class="footer-col">
+        <!-- Address -->
+        <div class="footer-col address">
             <h3>Berg Spices</h3>
-            <p>📞 +91 90742 68510</p>
-            <p>✉️ bergspices@gmail.com</p>
             <p>
+                Berg Spices<br>
                 Murukkady PO<br>
                 Murukkady, Idukki<br>
                 Kerala – 685535
             </p>
+            <p class="contact">
+                📞 +91 90742 68510<br>
+                ✉️ bergspices@gmail.com
+            </p>
         </div>
 
-        <!-- Quick Links -->
+        <!-- Links -->
         <div class="footer-col">
             <h3>Quick Links</h3>
             <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
@@ -23,28 +25,31 @@
 
         <!-- Social -->
         <div class="footer-col">
-            <h3>Follow Us</h3>
-            <a href="https://www.instagram.com/bergspices" target="_blank">
-                <i class="fa-brands fa-instagram"></i> Instagram
-            </a>
-            <a href="https://www.facebook.com/profile.php?id=61579951358354" target="_blank">
-                <i class="fa-brands fa-facebook"></i> Facebook
-            </a>
+            <h3>Connect</h3>
+
+            <div class="social-icons">
+                <a href="https://www.instagram.com/bergspices" target="_blank" class="insta">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+
+                <a href="https://www.facebook.com/profile.php?id=61579951358354" target="_blank" class="fb">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+            </div>
         </div>
 
         <!-- Certification -->
-        <div class="footer-col certification">
-            <h3>Certified & Trusted</h3>
+        <div class="footer-col cert">
+            <h3>Certified</h3>
             <img src="/static/images/fssai-logo.png" alt="FSSAI Certified">
-            <p>FSSAI Certified Products</p>
+            <p>FSSAI Certified</p>
             <small>Lic No: XXXXXXXX</small>
         </div>
 
     </div>
 
     <div class="footer-bottom">
-        © bergspices.com | All Rights Reserved <br>
-        Web design & SEO by JZ Creations | Version 1.0.1
+        © bergspices.com | All rights reserved  
+        <br>Web design & SEO by JZ Creations | Version 1.0.1
     </div>
-
 </footer>
