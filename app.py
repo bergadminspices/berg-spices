@@ -319,7 +319,11 @@ def create_razorpay_order():
         "updated_at": datetime.now()
     })
 
-    return jsonify(order)
+    return jsonify({
+    "order_id": order["id"],
+    "amount": amount,
+    "key": os.getenv("RAZORPAY_KEY_ID")
+})
     
 @csrf.exempt
 @app.route("/razorpay/webhook", methods=["POST"])
