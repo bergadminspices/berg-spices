@@ -1,55 +1,61 @@
-<footer class="footer">
-    <div class="footer-container">
+<footer class="footer-wrapper">
+    <div class="footer-card">
 
-        <!-- Address -->
-        <div class="footer-col address">
-            <h3>Berg Spices</h3>
-            <p>
-                Berg Spices<br>
-                Murukkady PO<br>
-                Murukkady, Idukki<br>
-                Kerala – 685535
-            </p>
-            <p class="contact">
-                📞 +91 90742 68510<br>
-                ✉️ bergspices@gmail.com
-            </p>
-        </div>
+        <div class="footer-grid">
 
-        <!-- Links -->
-        <div class="footer-col">
-            <h3>Quick Links</h3>
-            <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
-            <a href="{{ url_for('terms_conditions') }}">Terms & Conditions</a>
-        </div>
+            <!-- Address -->
+            <div class="footer-col">
+                <h3>Berg Spices</h3>
+                <p>
+                    Murukkady PO<br>
+                    Murukkady, Idukki<br>
+                    Kerala – 685535
+                </p>
 
-        <!-- Social -->
-        <div class="footer-col">
-            <h3>Connect</h3>
-
-            <div class="social-icons">
-                <a href="https://www.instagram.com/bergspices" target="_blank" class="insta">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-
-                <a href="https://www.facebook.com/profile.php?id=61579951358354" target="_blank" class="fb">
-                    <i class="fa-brands fa-facebook-f"></i>
-                </a>
+                <p class="contact">
+                    📞 +91 90742 68510<br>
+                    ✉️ bergspices@gmail.com
+                </p>
             </div>
+
+            <!-- Links -->
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+                <a href="{{ url_for('terms_conditions') }}">Terms & Conditions</a>
+            </div>
+
+            <!-- Social -->
+            <div class="footer-col">
+                <h3>Connect</h3>
+                <div class="social-buttons">
+                    <a href="https://www.instagram.com/bergspices" target="_blank" class="social insta">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61579951358354" target="_blank" class="social fb">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Certification -->
+            <div class="footer-col">
+                <h3>Certified</h3>
+                <div class="cert-badge">
+                    <img src="/static/images/fssai-logo.png">
+                    <div>
+                        FSSAI Certified<br>
+                        <small>Lic No: 21325178000466</small>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Certification -->
-        <div class="footer-col cert">
-            <h3>Certified</h3>
-            <img src="/static/images/fssai-logo.png" alt="FSSAI Certified">
-            <p>FSSAI Certified</p>
-            <small>Lic No: XXXXXXXX</small>
+        <div class="footer-bottom">
+            © bergspices.com | All rights reserved |
+            Web design & SEO by JZ Creations | Version 1.0.1
         </div>
 
-    </div>
-
-    <div class="footer-bottom">
-        © bergspices.com | All rights reserved  
-        <br>Web design & SEO by JZ Creations | Version 1.0.1
     </div>
 </footer>
