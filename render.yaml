@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: berg-spices
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    runtime: python-3.11.8
