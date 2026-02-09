@@ -1,93 +1,49 @@
-<footer style="background:#f3f3f3;padding:40px 15px;">
-    <div style="
-        max-width:1200px;
-        margin:auto;
-        background:#2e7d32;
-        color:#fff;
-        border-radius:24px;
-        padding:40px 30px 20px;
-        box-shadow:0 10px 25px rgba(0,0,0,0.15);
-        font-family:Segoe UI, sans-serif;
-    ">
+<footer class="main-footer">
+  <div class="footer-box">
 
-        <div style="
-            display:flex;
-            flex-wrap:wrap;
-            gap:30px;
-        ">
+    <div class="footer-row">
 
-            <!-- Address -->
-            <div style="flex:1.8; min-width:250px;">
-                <h3 style="margin-bottom:15px;">Berg Spices</h3>
-                <p>
-                    Murukkady PO<br>
-                    Murukkady, Idukki<br>
-                    Kerala – 685535
-                </p>
-                <p>📞 +91 90742 68510</p>
-                <p>✉️ bergspices@gmail.com</p>
-            </div>
+      <div class="footer-col footer-wide">
+        <h3>Berg Spices</h3>
+        <p>
+          Murukkady PO<br>
+          Murukkady, Idukki<br>
+          Kerala – 685535
+        </p>
+        <p>📞 +91 90742 68510</p>
+        <p>✉️ bergspices@gmail.com</p>
+      </div>
 
-            <!-- Links -->
-            <div style="flex:1; min-width:180px;">
-                <h3 style="margin-bottom:15px;">Quick Links</h3>
-                <a href="{{ url_for('privacy_policy') }}" style="display:block;color:#e8f5e9;margin-bottom:6px;">Privacy Policy</a>
-                <a href="{{ url_for('terms_conditions') }}" style="display:block;color:#e8f5e9;">Terms & Conditions</a>
-            </div>
+      <div class="footer-col">
+        <h3>Quick Links</h3>
+        <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+        <a href="{{ url_for('terms_conditions') }}">Terms & Conditions</a>
+      </div>
 
-            <!-- Social -->
-            <div style="flex:1; min-width:180px;">
-                <h3 style="margin-bottom:15px;">Connect</h3>
-                <div style="display:flex;gap:12px;">
-                    <a href="https://www.instagram.com/bergspices" target="_blank"
-                       style="width:40px;height:40px;border-radius:50%;
-                       display:flex;align-items:center;justify-content:center;
-                       color:#fff;
-                       background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7);">
-                        <i class="fa-brands fa-instagram"></i>
-                    </a>
-
-                    <a href="https://www.facebook.com/profile.php?id=61579951358354" target="_blank"
-                       style="width:40px;height:40px;border-radius:50%;
-                       display:flex;align-items:center;justify-content:center;
-                       color:#fff;background:#1877f2;">
-                        <i class="fa-brands fa-facebook-f"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Certification -->
-            <div style="flex:1.2; min-width:200px;">
-                <h3 style="margin-bottom:15px;">Certified</h3>
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    gap:10px;
-                    background:rgba(255,255,255,0.15);
-                    padding:10px;
-                    border-radius:12px;
-                ">
-                    <img src="/static/images/fssai-logo.png"
-                         style="width:80px;background:#fff;padding:5px;border-radius:6px;">
-                    <div>
-                        FSSAI Certified<br>
-                        <small>Lic No: 21325178000466</small>
-                    </div>
-                </div>
-            </div>
-
+      <div class="footer-col">
+        <h3>Connect</h3>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/bergspices" target="_blank" class="ig">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=61579951358354" target="_blank" class="fb">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
         </div>
+      </div>
 
-        <div style="
-            text-align:center;
-            border-top:1px solid rgba(255,255,255,0.2);
-            margin-top:25px;
-            padding-top:15px;
-            font-size:13px;
-        ">
-            © bergspices.com | All rights reserved |
-            Web design & SEO by JZ Creations | Version 1.0.1
-        </div>
+      <div class="footer-col">
+        <h3>Certified</h3>
+        <img src="/static/images/fssai-logo.png" class="fssai">
+        <div>FSSAI Certified<br><small>Lic No: 21325178000466</small></div>
+      </div>
 
     </div>
+
+    <div class="footer-copy">
+      © bergspices.com | All rights reserved |
+      Web design & SEO by JZ Creations | Version 1.0.1
+    </div>
+
+  </div>
 </footer>
