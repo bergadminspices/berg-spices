@@ -306,23 +306,24 @@ def create_razorpay_order():
         "payment_capture": 1
     })
 
-    orders_col.insert_one({
-        "order_id": str(uuid.uuid4())[:8].upper(),
-        "payment": {
-            "method": "ONLINE",
-            "status": "CREATED",
-            "razorpay_order_id": order["id"]
-        },
-        "status": "PAYMENT_PENDING",
-        "created_at": datetime.now(),
-        "updated_at": datetime.now()
-    })
+            orders_col.insert_one({
+            "order_id": str(uuid.uuid4())[:8].upper(),
+            "payment": {
+                "method": "ONLINE",
+                "status": "CREATED",
+                "razorpay_order_id": order["id"]
+            },
+            "status": "PAYMENT_PENDING",
+            "created_at": datetime.now(),
+            "updated_at": datetime.now()
+        })
 
-    return jsonify({
-    "order_id": order["id"],
-    "amount": amount,
-    "key": os.getenv("RAZORPAY_KEY_ID")
-})
+        return jsonify({
+            "order_id": order["id"],
+            "amount": amount,
+            "key": os.getenv("RAZORPAY_KEY_ID")
+        })
+
     
 @csrf.exempt
 @app.route("/razorpay/webhook", methods=["POST"])
