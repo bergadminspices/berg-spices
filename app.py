@@ -306,24 +306,12 @@ def create_razorpay_order():
         "payment_capture": 1
     })
 
-    orders_col.insert_one({
-        "order_id": str(uuid.uuid4())[:8].upper(),
-        "payment": {
-            "method": "ONLINE",
-            "status": "CREATED",
-            "razorpay_order_id": order["id"]
-        },
-        "status": "PAYMENT_PENDING",
-        "created_at": datetime.now(),
-        "updated_at": datetime.now()
-    })
-
     return jsonify({
         "order_id": order["id"],
         "amount": amount,
         "key": os.getenv("RAZORPAY_KEY_ID")
     })
-    
+ 
 @csrf.exempt
 @app.route("/razorpay/webhook", methods=["POST"])
 def razorpay_webhook():
@@ -769,7 +757,7 @@ def place_order():
             order_status = "PLACED"
             transaction_id = rp_payment_id
 
-        except SignatureVerificationError:
+        except Exception as e:
             flash("Payment verification failed", "danger")
             return redirect(url_for("checkout"))
 
@@ -779,7 +767,7 @@ def place_order():
 
     # ---------------- CREATE ORDER ----------------
     order = {
-        "order_id": str(uuid.uuid4())[:8].upper(),
+        "order_id": secrets.token_hex(4).upper()
         "name": name,
         "phone": phone,
         "email": email,
