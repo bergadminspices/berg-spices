@@ -767,7 +767,7 @@ def place_order():
 
     # ---------------- CREATE ORDER ----------------
     order = {
-        "order_id": secrets.token_hex(4).upper()
+        "order_id": secrets.token_hex(4).upper(),
         "name": name,
         "phone": phone,
         "email": email,
