@@ -32,7 +32,7 @@
       <p><strong>Name:</strong> {{ order.name }}</p>
       <p><strong>Phone:</strong> {{ order.phone }}</p>
       <p><strong>Email:</strong> {{ order.email }}</p>
-	  <p class="mb-0 text-muted" style="white-space: pre-line;"><strong>Address: </strong>{{ order.address.replace(',', ',<br>') | safe }}</p>
+	  <p class="mb-0 text-muted" style="white-space: pre-line;"><strong>Address: </strong>{{ order.get('address', 'No address provided').replace(',', ',<br>') | safe }}</p>
 	  
 	  {% set status_color = {
 		  'PLACED': 'secondary',
