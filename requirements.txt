@@ -10,3 +10,4 @@ xhtml2pdf==0.2.11
 gunicorn==21.2.0
 razorpay==1.4.2
 setuptools==69.5.1
+cloudinary==1.36.0
