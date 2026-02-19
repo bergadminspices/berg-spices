@@ -242,39 +242,54 @@ def send_sms(phone_number, message):
 @app.route('/admin/products/add', methods=['GET', 'POST'])
 @admin_required
 def add_product():
-   if request.method == 'POST':
-    name = request.form['name']
-    packet_labels = request.form.getlist("packet_label[]")
-    packet_prices = request.form.getlist("packet_price[]")
 
-    price_options = []
+    if request.method == 'POST':
+        try:
+            name = request.form.get('name', '').strip()
 
-    for label, price in zip(packet_labels, packet_prices):
-        if label and price:
-            price_options.append({
-                "label": label.strip(),
-                "price": float(price)
+            packet_labels = request.form.getlist("packet_label[]")
+            packet_prices = request.form.getlist("packet_price[]")
+
+            price_options = []
+
+            for label, price in zip(packet_labels, packet_prices):
+                if label and price:
+                    price_options.append({
+                        "label": label.strip(),
+                        "price": float(price)
+                    })
+
+            # 🔒 Safety check
+            if not price_options:
+                flash("At least one packet option is required.", "danger")
+                return redirect(request.url)
+
+            description = request.form.get('description', '')
+            image_url = request.form.get('image_url', '')
+            stock = int(request.form.get('stock') or 0)
+            category = request.form.get('category', '')
+
+            products_col.insert_one({
+                "name": name,
+                "price_options": price_options,
+                "description": description,
+                "image_url": image_url,
+                "stock": stock,
+                "category": category,
+                "created_at": datetime.utcnow()
             })
 
-    description = request.form['description']
-    image_url = request.form['image_url']
-    stock = int(request.form['stock'])
-    category = request.form['category']
+            flash("Product added successfully!", "success")
+            return redirect(url_for('admin_products'))
 
-    products_col.insert_one({
-        "name": name,
-        "price_options": price_options,
-        "description": description,
-        "image_url": image_url,
-        "stock": stock,
-        "category": category,
-        "created_at": datetime.utcnow()
-    })
+        except Exception as e:
+            print("ADD PRODUCT ERROR:", e)
+            flash("Error adding product.", "danger")
+            return redirect(request.url)
 
-    flash("Product added successfully!", "success")
-    return redirect(url_for('admin_products'))
-
+    # ✅ THIS MUST BE OUTSIDE POST BLOCK
     return render_template('add_product.html')
+
 # -------------------------
 # Edit_product
 # -------------------------
