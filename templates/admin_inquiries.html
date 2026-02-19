@@ -100,10 +100,11 @@
   <!-- SIDEBAR -->
   <div class="offcanvas-md offcanvas-start sidebar" id="adminSidebar">
     <h4 class="text-center mb-4">Admin Panel</h4>
-    <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
-    <a href="{{ url_for('admin_view_orders') }}"><i class="fas fa-box"></i> Orders</a>
-    <a href="{{ url_for('admin_inquiries') }}"><i class="fas fa-envelope"></i> Messages</a>
-    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home me-2"></i> Dashboard</a>
+    <a href="{{ url_for('admin_view_orders') }}"><i class="fas fa-box me-2"></i> Orders</a>
+    <a href="{{ url_for('admin_inquiries') }}"><i class="fas fa-envelope me-2"></i> Messages</a>
+	<a href="{{ url_for('admin_products') }}"><i class="fas fa-spa me-2"></i> Products</a>
+    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
   </div>
 
   <!-- CONTENT -->
