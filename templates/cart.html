@@ -4,210 +4,208 @@
   <meta charset="UTF-8">
   <title>Your Cart - BERG SPICES</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   <style>
     body { background: #fffdf5; }
     .navbar { background: #2e7d32; }
-    .navbar-brand img { height: 100px; border-radius: 40px; }
-    .brand-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.76rem; color: #fbc02d; }
-    .navbar-quote { font-size: 0.9rem; font-style: italic; color: #fbc02d; }
     .btn-success { background-color: #2e7d32 !important; border: none; }
     .btn-success:hover { background-color: #256428 !important; }
 
     .cart-table { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .cart-table thead { background: #f8f9fa; }
-    .cart-table tbody tr:hover { background: #fef7e0; transition: background 0.3s ease-in-out; }
+    .cart-table tbody tr:hover { background: #fef7e0; transition: 0.3s; }
     .cart-img { height: 60px; border-radius: 8px; }
 
     .quantity-controls { display: flex; align-items: center; gap: 5px; }
-    .quantity-controls button { width: 30px; height: 30px; border-radius: 6px; padding: 0; }
+    .quantity-controls button { width: 34px; height: 34px; border-radius: 6px; padding: 0; }
     .quantity-controls input { width: 60px; text-align: center; }
   </style>
 </head>
+
 <body>
-  {% include 'navbar.html' %}
 
-  <div class="container py-5">
-    <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h2>
+{% include 'navbar.html' %}
 
-    <!-- Alerts -->
-    <div id="flash-messages">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-    </div>
+<div class="container py-5">
 
-    {% if cart|length == 0 %}
-      <div class="alert alert-warning">Your cart is empty.</div>
-      <a href="{{ url_for('home') }}" class="btn btn-success btn-lg mt-3">
-        <i class="fas fa-arrow-left"></i> Continue Shopping
-      </a>
+<h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h2>
+
+{% if cart|length == 0 %}
+
+<div class="alert alert-warning">Your cart is empty.</div>
+<a href="{{ url_for('home') }}" class="btn btn-success btn-lg mt-3">
+  <i class="fas fa-arrow-left"></i> Continue Shopping
+</a>
+
+{% else %}
+
+<div class="table-responsive">
+<table class="table table-striped align-middle cart-table">
+<thead>
+<tr>
+  <th>Product</th>
+  <th>Packet</th>
+  <th>Quantity</th>
+  <th>Price</th>
+  <th>Subtotal</th>
+  <th></th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in cart %}
+<tr data-id="{{ item.id }}" data-packet="{{ item.packet }}">
+  <td>
+    {% if item.image.startswith('http') %}
+      <img src="{{ item.image }}" class="cart-img">
     {% else %}
-      <form action="{{ url_for('bulk_remove') }}" method="POST">
-		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="table-responsive">
-          <table class="table table-striped align-middle cart-table">
-            <thead>
-              <tr>
-                <th style="width:40px;"></th>
-                <th>Product</th>
-                <th>Packet</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in cart %}
-              <tr data-id="{{ item.id }}" data-packet="{{ item.packet }}">
-                <td>
-                  <input type="checkbox" name="selected_items" value="{{ item.id }}||{{ item.packet }}">
-                </td>
-                <td>
-                  {% if item.image.startswith('http') %}
-					<img src="{{ item.image }}" alt="{{ item.name }}" class="cart-img">
-				{% else %}
-					<img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" class="cart-img">
-				{% endif %}
-
-
-                  <span class="ms-2">{{ item.name }}</span>
-                </td>
-                <td>{{ item.packet }}</td>
-                <td>
-                  <div class="d-flex quantity-controls">
-                    <button type="button" class="btn btn-outline-secondary btn-sm decrease"><i class="fas fa-minus"></i></button>
-                    <input type="number" class="form-control form-control-sm quantity-input" value="{{ item.quantity }}" min="1">
-                    <button type="button" class="btn btn-outline-secondary btn-sm increase"><i class="fas fa-plus"></i></button>
-                  </div>
-                </td>
-                <td>₹{{ "%.2f"|format(item.price) }}</td>
-                <td class="subtotal">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <button type="submit" class="btn btn-danger">
-            <i class="fas fa-trash-alt"></i> Remove Selected
-          </button>
-          <h4 class="text-end">Total: <span id="cart-total" class="text-success">₹{{ "%.2f"|format(total) }}</span></h4>
-        </div>
-      </form>
-
-      <div class="mt-4 d-flex gap-2">
-        <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg">
-          <i class="fas fa-credit-card"></i> Proceed to Checkout
-        </a>
-        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
-          <i class="fas fa-arrow-left"></i> Continue Shopping
-        </a>
-      </div>
+      <img src="{{ url_for('static', filename=item.image) }}" class="cart-img">
     {% endif %}
-  </div>
-  <script> const csrfToken = "{{ csrf_token() }}"; </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <span class="ms-2">{{ item.name }}</span>
+  </td>
+
+  <td>{{ item.packet }}</td>
+
+  <td>
+    <div class="quantity-controls">
+      <button class="btn btn-outline-secondary decrease">
+        <span class="btn-text"><i class="fas fa-minus"></i></span>
+        <span class="spinner-border spinner-border-sm d-none"></span>
+      </button>
+
+      <input type="number"
+             class="form-control form-control-sm quantity-input"
+             value="{{ item.quantity }}"
+             min="1">
+
+      <button class="btn btn-outline-secondary increase">
+        <span class="btn-text"><i class="fas fa-plus"></i></span>
+        <span class="spinner-border spinner-border-sm d-none"></span>
+      </button>
+    </div>
+  </td>
+
+  <td>₹{{ "%.2f"|format(item.price) }}</td>
+  <td class="subtotal">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+
+  <td>
+    <button class="btn btn-outline-danger remove-item">
+      <i class="bi bi-trash"></i>
+      <span class="spinner-border spinner-border-sm d-none"></span>
+    </button>
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+  <h4>Total: <span id="cart-total" class="text-success">₹{{ "%.2f"|format(total) }}</span></h4>
+
+  <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg">
+    <i class="fas fa-credit-card"></i> Checkout
+  </a>
+</div>
+
+{% endif %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-function animateValue(element, start, end, duration = 200) {
+function animateValue(element, start, end) {
+    let duration = 200;
     let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        element.text('₹' + (start + progress * (end - start)).toFixed(2));
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
+    function step(timestamp){
+        if(!startTimestamp) startTimestamp = timestamp;
+        let progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        element.text('₹' + (start + progress*(end-start)).toFixed(2));
+        if(progress < 1) window.requestAnimationFrame(step);
+    }
     window.requestAnimationFrame(step);
 }
 
-function updateCartRow(row, quantity, subtotal, total) {
-
-    let oldSubtotal = parseFloat(row.find('.subtotal').text().replace('₹',''));
-    let oldTotal = parseFloat($('#cart-total').text().replace('₹',''));
-
-    row.find('.quantity-input').val(quantity);
-
-    animateValue(row.find('.subtotal'), oldSubtotal, subtotal);
-    animateValue($('#cart-total'), oldTotal, total);
-
-    // Disable minus if qty = 1
-    if(quantity <= 1){
-        row.find('.decrease').prop('disabled', true);
+function setLoading(btn, state){
+    if(state){
+        btn.prop("disabled", true);
+        btn.find(".btn-text, i").addClass("d-none");
+        btn.find(".spinner-border").removeClass("d-none");
     } else {
-        row.find('.decrease').prop('disabled', false);
+        btn.prop("disabled", false);
+        btn.find(".btn-text, i").removeClass("d-none");
+        btn.find(".spinner-border").addClass("d-none");
+    }
+}
+
+function updateRow(row, quantity, subtotal, total){
+    let oldSubtotal = parseFloat(row.find(".subtotal").text().replace("₹",""));
+    let oldTotal = parseFloat($("#cart-total").text().replace("₹",""));
+
+    row.find(".quantity-input").val(quantity);
+    animateValue(row.find(".subtotal"), oldSubtotal, subtotal);
+    animateValue($("#cart-total"), oldTotal, total);
+
+    if(quantity <= 1){
+        row.find(".decrease").prop("disabled", true);
+    } else {
+        row.find(".decrease").prop("disabled", false);
     }
 
-    // Auto remove if qty = 0
     if(quantity <= 0){
         row.fadeOut(300, function(){
             $(this).remove();
-            if($('tbody tr').length === 0){
+            if($("tbody tr").length === 0){
                 location.reload();
             }
         });
     }
 }
 
-$(document).ready(function(){
+$(document).on("click", ".increase, .decrease", function(){
+    let row = $(this).closest("tr");
+    let product_id = row.data("id");
+    let packet = row.data("packet");
+    let action = $(this).hasClass("increase") ? "increase" : "decrease";
+    let btn = $(this);
 
-    // Disable minus initially if qty = 1
-    $('.quantity-input').each(function(){
-        let row = $(this).closest('tr');
-        if(parseInt($(this).val()) <= 1){
-            row.find('.decrease').prop('disabled', true);
+    setLoading(btn, true);
+
+    $.post(`/update_quantity_ajax/${product_id}`, {
+        action: action,
+        packet: packet
+    }, function(response){
+        if(response.success){
+            updateRow(row, response.quantity, response.subtotal, response.total);
+        }
+    }).always(function(){
+        setLoading(btn, false);
+    });
+});
+
+$(document).on("click", ".remove-item", function(){
+    let row = $(this).closest("tr");
+    let product_id = row.data("id");
+    let packet = row.data("packet");
+    let btn = $(this);
+
+    setLoading(btn, true);
+
+    $.post(`/update_quantity_ajax/${product_id}`, {
+        action: "set",
+        quantity: 0,
+        packet: packet
+    }, function(response){
+        if(response.success){
+            updateRow(row, 0, 0, response.total);
         }
     });
-
-    $('.increase, .decrease').click(function(){
-        let row = $(this).closest('tr');
-        let product_id = row.data('id');
-        let packet = row.data('packet');
-        let action = $(this).hasClass('increase') ? 'increase' : 'decrease';
-
-        $.post(`/update_quantity_ajax/${product_id}`, {
-            action: action,
-            packet: packet
-        }, function(response){
-            if(response.success){
-                updateCartRow(row, response.quantity, response.subtotal, response.total);
-            }
-        });
-    });
-
-    $('.quantity-input').change(function(){
-        let row = $(this).closest('tr');
-        let product_id = row.data('id');
-        let packet = row.data('packet');
-        let qty = parseInt($(this).val());
-
-        if(qty < 1) qty = 0;
-
-        $.post(`/update_quantity_ajax/${product_id}`, {
-            action: 'set',
-            quantity: qty,
-            packet: packet
-        }, function(response){
-            if(response.success){
-                updateCartRow(row, response.quantity, response.subtotal, response.total);
-            }
-        });
-    });
-
 });
 </script>
-
 
 </body>
 </html>
