@@ -1,0 +1,70 @@
+<form method="POST" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3">
+    <label>Name</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+
+<div class="mb-3">
+    <label class="form-label">Packet Pricing</label>
+    <div id="price-options">
+        <div class="row mb-2 price-row">
+            <div class="col">
+                <input type="text" name="packet_label[]" class="form-control" placeholder="e.g. 50g" required>
+            </div>
+            <div class="col">
+                <input type="number" step="0.01" name="packet_price[]" class="form-control" placeholder="Price" required>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-danger remove-row">X</button>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-secondary mt-2" id="add-price-row">
+        + Add Packet Option
+    </button>
+</div>
+
+<script>
+document.getElementById("add-price-row").addEventListener("click", function() {
+    let container = document.getElementById("price-options");
+    let newRow = document.querySelector(".price-row").cloneNode(true);
+    newRow.querySelectorAll("input").forEach(input => input.value = "");
+    container.appendChild(newRow);
+});
+
+document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("remove-row")) {
+        if (document.querySelectorAll(".price-row").length > 1) {
+            e.target.closest(".price-row").remove();
+        }
+    }
+});
+</script>
+
+
+  <div class="mb-3">
+    <label>Description</label>
+    <textarea name="description" class="form-control"></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label>Image URL (Cloudinary)</label>
+    <input type="text" name="image_url" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Stock</label>
+    <input type="number" name="stock" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label>Category</label>
+    <input type="text" name="category" class="form-control">
+  </div>
+
+  <button class="btn btn-success">Save Product</button>
+  
+  <input type="file" name="image" accept="image/*" required>
+</form>

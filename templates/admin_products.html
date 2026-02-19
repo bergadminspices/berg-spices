@@ -1,0 +1,45 @@
+{% extends "admin_dashboard.html" %}
+{% block content %}
+
+<div class="container mt-4">
+  <h3>Manage Products</h3>
+  <a href="{{ url_for('add_product') }}" class="btn btn-success mb-3">Add Product</a>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
+      <tr>
+        <td>{{ product.name }}</td>
+        <td>
+		{% if product.price_options %}
+		  {% set prices = product.price_options | map(attribute='price') | list %}
+		  ₹{{ prices|min }} – ₹{{ prices|max }}
+		{% else %}
+		  -
+		{% endif %}
+		</td>
+        <td>{{ product.stock }}</td>
+        <td>
+          <a href="{{ url_for('edit_product', product_id=product._id) }}" class="btn btn-sm btn-primary">Edit</a>
+          <a href="{{ url_for('delete_product', product_id=product._id) }}" 
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Delete this product?')">
+             Delete
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
