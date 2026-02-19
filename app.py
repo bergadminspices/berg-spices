@@ -716,18 +716,21 @@ def remove_from_cart(product_id):
 @app.route("/bulk_remove", methods=["POST"])
 def bulk_remove():
     selected_items = request.form.getlist("selected_items")
+
     if not selected_items:
         flash("No items selected.", "warning")
         return redirect(url_for("view_cart"))
 
     new_cart = []
-    for item in session.get("cart", []):
-    key = f"{str(item.get('id'))}||{item.get('packet')}"
 
+    for item in session.get("cart", []):
+        key = f"{str(item.get('product_id'))}||{item.get('packet')}"
         if key not in selected_items:
             new_cart.append(item)
 
     session["cart"] = new_cart
+    session.modified = True
+
     flash("Selected items removed.", "success")
     return redirect(url_for("view_cart"))
 
