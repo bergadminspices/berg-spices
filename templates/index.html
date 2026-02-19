@@ -42,17 +42,22 @@
           {% for product in items %}
           <div class="col-md-3">
             <div class="card h-100 text-center p-3">
-              <img src="{{ url_for('static', filename=product.image) }}" class="card-img-top mx-auto" style="max-height:200px; object-fit:contain;" alt="{{ product.name }}">
+              <img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top mx-auto" style="max-height:200px; object-fit:contain;" alt="{{ product.name }}">
               <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <div class="rating">★★★★★</div>
 
-                {% if product.price_options %}
-                  {% set prices = product.price_options | map(attribute='price') | list %}
-                  <p class="price-range">₹{{ prices|min }} – ₹{{ prices|max }}</p>
-                {% else %}
-                  <p class="price-range text-muted">Price not available</p>
-                {% endif %}
+                {% if product.price_options and product.price_options|length > 0 %}
+			  {% set prices = product.price_options | selectattr('price') | map(attribute='price') | list %}
+			  {% if prices %}
+				<p class="price-range">₹{{ prices|min }} – ₹{{ prices|max }}</p>
+			  {% else %}
+				<p class="price-range text-muted">Price not available</p>
+			  {% endif %}
+			{% else %}
+			  <p class="price-range text-muted">Price not available</p>
+			{% endif %}
+
 
                 <p class="text-muted small">{{ product.description }}</p>
                 <a href="{{ url_for('product_detail', product_id=product['_id']) }}" class="btn btn-select w-100 mt-2">Select Options 
@@ -138,7 +143,7 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const bee = document.querySelector(".bee-fly");
+    const bee = document.querySelector(".bee");
     if (bee) {
       bee.style.animationDelay = `-${Math.random() * 10}s`;
     }
