@@ -11,7 +11,6 @@ from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import ast
-import csv
 import os
 import smtplib
 from email.mime.text import MIMEText
@@ -41,6 +40,8 @@ import hmac
 import hashlib
 import json
 import secrets
+import cloudinary
+import cloudinary.uploader
 
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET")
@@ -236,58 +237,77 @@ def send_sms(phone_number, message):
     return True
 
 # -------------------------
-# Load products.csv into MongoDB (one-time sync)
+# add_product
 # -------------------------
-def sync_products_from_csv():
-    if not os.path.exists("products.csv"):
-        print("products.csv not found")
-        return
+@app.route('/admin/products/add', methods=['GET', 'POST'])
+@admin_required
+def add_product():
+    if request.method == 'POST':
+        name = request.form['name']
+        packet_labels = request.form.getlist("packet_label[]")
+        packet_prices = request.form.getlist("packet_price[]")
 
-    csv_skus = set()  # 🔑 track all products in CSV
+        price_options = []
 
-    with open("products.csv", newline="", encoding="utf-8") as csvfile:
-        reader = csv.DictReader(csvfile)
+        for label, price in zip(packet_labels, packet_prices):
+            if label and price:
+                price_options.append({
+                    "label": label.strip(),
+                    "price": float(price)
+                })
 
-        for row in reader:
-            sku = row.get("sku")
-            if not sku:
-                continue  # skip bad rows
+        description = request.form['description']
+        image_url = request.form['image_url']
+        stock = int(request.form['stock'])
+        category = request.form['category']
 
-            csv_skus.add(sku)
+        mongo.db.products.insert_one({
+            "name": name,
+            "price": price,
+            "description": description,
+            "image_url": image_url,
+            "stock": stock,
+            "category": category,
+            "created_at": datetime.utcnow()
+        })
 
-            # safely parse price_options
-            try:
-                price_options = ast.literal_eval(row.get("price_options", "[]"))
-            except Exception:
-                price_options = []
+        flash("Product added successfully!", "success")
+        return redirect(url_for('admin_products'))
 
-            product = {
-                "sku": sku,
-                "name": row.get("name"),
-                "image": row.get("image"),
-                "description": row.get("description"),
-                "category": row.get("category"),
-                "price_options": price_options,
-                "updated_at": datetime.now()
-            }
-
-            # 🔁 UPDATE or INSERT
-            products_col.update_one(
-                {"sku": sku},
-                {"$set": product},
-                upsert=True
-            )
-
-    # 🗑️ DELETE products removed from CSV
-    products_col.delete_many({
-        "sku": {"$nin": list(csv_skus)}
-    })
-
-    print("✅ Products synced with CSV")
+    return render_template('add_product.html')
 
 
-# Run sync on startup
-# sync_products_from_csv()
+# -------------------------
+# Edit_product
+# -------------------------
+@app.route('/admin/products/edit/<product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    product = mongo.db.products.find_one({"_id": ObjectId(product_id)})
+
+    if request.method == 'POST':
+        mongo.db.products.update_one(
+            {"_id": ObjectId(product_id)},
+            {"$set": {
+                "name": request.form['name'],
+                "price": float(request.form['price']),
+                "description": request.form['description'],
+                "image_url": request.form['image_url'],
+                "stock": int(request.form['stock']),
+                "category": request.form['category']
+            }}
+        )
+
+        flash("Product updated!", "success")
+        return redirect(url_for('admin_products'))
+
+    return render_template('edit_product.html', product=product)
+# -------------------------
+# Delete_product
+# -------------------------
+@app.route('/admin/products')
+def admin_products():
+    products = mongo.db.products.find()
+    return render_template('admin_products.html', products=products)
 
 #------------------------
 # --- Razor Pay
@@ -405,15 +425,6 @@ def razorpay_webhook():
         )
 
     return "OK", 200
-
-
-# Admin-triggered manual sync
-@app.route("/admin/sync-products")
-@admin_required
-def admin_sync_products():
-    sync_products_from_csv()
-    flash("Products synced from CSV!", "success")
-    return redirect(url_for("admin_dashboard"))
 
 # -------------------------
 # Seed default admin (only if none exists)
@@ -538,49 +549,67 @@ def product_detail(product_id):
 # -------------------------
 # Shopping Cart (add/view/remove/bulk)
 # -------------------------
-@app.route("/add_to_cart/<product_id>", methods=["POST"])
+@app.route("/add-to-cart/<product_id>", methods=["POST"])
 def add_to_cart(product_id):
-    try:
-        product = products_col.find_one({"_id": ObjectId(product_id)})
-    except Exception:
-        product = None
+
+    product = mongo.db.products.find_one({"_id": ObjectId(product_id)})
 
     if not product:
-        flash("Product not found", "danger")
+        flash("Product not found.", "danger")
         return redirect(url_for("home"))
 
-    selected_option = request.form.get("packet_option")
-    try:
-        quantity = int(request.form.get("quantity", 1))
-    except (ValueError, TypeError):
+    selected_label = request.form.get("packet_option")
+    quantity = int(request.form.get("quantity", 1))
+
+    if not selected_label:
+        flash("Please select a packet size.", "danger")
+        return redirect(request.referrer)
+
+    if quantity < 1:
         quantity = 1
 
-    if not selected_option:
-        flash("Please select a packet size!", "danger")
-        return redirect(url_for("product_detail", product_id=product_id))
+    # 🔒 Securely fetch price from DB (DO NOT trust frontend)
+    option = next(
+        (o for o in product.get("price_options", []) if o["label"] == selected_label),
+        None
+    )
 
-    price = next((p.get("price") for p in product.get("price_options", []) if p.get("label") == selected_option), None)
-    if price is None:
-        flash("Invalid packet option!", "danger")
-        return redirect(url_for("product_detail", product_id=product_id))
+    if not option:
+        flash("Invalid packet selection.", "danger")
+        return redirect(request.referrer)
+
+    price = float(option["price"])
 
     cart = session.get("cart", [])
+
+    # ✅ If same product + packet already exists, increase quantity
+    item_found = False
     for item in cart:
-        if item.get("id") == str(product_id) and item.get("packet") == selected_option:
-            item["quantity"] = item.get("quantity", 0) + quantity
+        if (
+            item["product_id"] == str(product["_id"])
+            and item["packet"] == selected_label
+        ):
+            item["quantity"] += quantity
+            item_found = True
             break
-    else:
-        cart.append({
-            "id": str(product_id),
-            "name": product.get("name"),
-            "price": float(price),
-            "packet": selected_option,
+
+    if not item_found:
+        cart_item = {
+            "product_id": str(product["_id"]),
+            "name": product["name"],
+            "packet": selected_label,
+            "price": price,
             "quantity": quantity,
-            "image": product.get("image", "no_image.jpg")
-        })
+            "image": product.get("image_url", "")
+        }
+        cart.append(cart_item)
+
     session["cart"] = cart
-    flash(f"{product.get('name')} ({selected_option}) x{quantity} added!", "success")
+    session.modified = True
+
+    flash("Product added to cart!", "success")
     return redirect(url_for("view_cart"))
+
 
 @app.route("/cart")
 def view_cart():
@@ -1202,7 +1231,7 @@ def live_search():
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify([])
-    results = list(products_col.find({"name": {"$regex": q, "$options": "i"}}, {"_id": 1, "name": 1, "image": 1}).limit(10))
+    results = list(products_col.find({"name": {"$regex": q, "$options": "i"}}, {"_id": 1, "name": 1, "image_url": 1}).limit(10))
     for r in results:
         r["_id"] = str(r.get("_id"))
     return jsonify(results)
