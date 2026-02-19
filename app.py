@@ -332,6 +332,7 @@ def edit_product(product_id):
 # Delete_product
 # -------------------------
 @app.route('/admin/products')
+@admin_required
 def admin_products():
     products = products_col.find()
     return render_template('admin_products.html', products=products)
