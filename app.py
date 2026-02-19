@@ -688,7 +688,9 @@ def add_to_cart(product_id):
     flash("Product added to cart!", "success")
     return redirect(url_for("view_cart"))
 
-
+#--------------------
+#Cart
+#--------------------
 @app.route("/cart")
 def view_cart():
     cart = session.get("cart", [])
@@ -720,7 +722,8 @@ def bulk_remove():
 
     new_cart = []
     for item in session.get("cart", []):
-        key = f"{item.get('id')}||{item.get('packet')}"
+    key = f"{str(item.get('id'))}||{item.get('packet')}"
+
         if key not in selected_items:
             new_cart.append(item)
 
@@ -742,7 +745,7 @@ def update_quantity_ajax(product_id):
 
     # find matching item. if packet provided match both; otherwise match by id (first found)
     for it in cart:
-        if str(it.get("id")) == product_id and (packet is None or it.get("packet") == packet):
+        if str(it.get("id")) == str(product_id) and (packet is None or it.get("packet") == packet):
             item = it
             if action == "increase":
                 it["quantity"] = it.get("quantity", 0) + 1
