@@ -42,6 +42,7 @@ import json
 import secrets
 import cloudinary
 import cloudinary.uploader
+import cloudinary.api
 
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET")
@@ -259,16 +260,34 @@ def add_product():
                         "price": float(price)
                     })
 
-            # 🔒 Safety check
+            # 🔒 Ensure at least one packet option exists
             if not price_options:
                 flash("At least one packet option is required.", "danger")
                 return redirect(request.url)
 
             description = request.form.get('description', '')
-            image_url = request.form.get('image_url', '')
             stock = int(request.form.get('stock') or 0)
             category = request.form.get('category', '')
 
+            # -------------------------
+            # IMAGE UPLOAD TO CLOUDINARY
+            # -------------------------
+            image_file = request.files.get('image')
+            image_url = ""
+
+            if image_file and image_file.filename != "":
+                upload_result = cloudinary.uploader.upload(image_file)
+                image_url = upload_result.get("secure_url")
+
+            # 🚀 Optional Upgrade (Recommended)
+            # Prevent saving product without image
+            if not image_url:
+                flash("Image upload failed. Please upload an image.", "danger")
+                return redirect(request.url)
+
+            # -------------------------
+            # SAVE PRODUCT
+            # -------------------------
             products_col.insert_one({
                 "name": name,
                 "price_options": price_options,
@@ -287,8 +306,8 @@ def add_product():
             flash("Error adding product.", "danger")
             return redirect(request.url)
 
-    # ✅ THIS MUST BE OUTSIDE POST BLOCK
     return render_template('add_product.html')
+
 
 # -------------------------
 # Edit_product
