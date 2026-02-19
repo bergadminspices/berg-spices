@@ -329,13 +329,29 @@ def edit_product(product_id):
     return render_template('edit_product.html', product=product)
 
 # -------------------------
-# Delete_product
+# products
 # -------------------------
 @app.route('/admin/products')
 @admin_required
 def admin_products():
     products = products_col.find()
     return render_template('admin_products.html', products=products)
+    
+# -------------------------
+# Delete Product
+# -------------------------
+@app.route('/admin/products/delete/<product_id>', methods=['POST'])
+@admin_required
+def delete_product(product_id):
+    try:
+        products_col.delete_one({"_id": ObjectId(product_id)})
+        flash("Product deleted successfully!", "success")
+    except Exception as e:
+        print("Delete error:", e)
+        flash("Failed to delete product.", "danger")
+
+    return redirect(url_for('admin_products'))
+
 
 #------------------------
 # --- Razor Pay
