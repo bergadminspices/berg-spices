@@ -313,6 +313,7 @@ def add_product():
 # Edit_product
 # -------------------------
 @app.route('/admin/products/edit/<product_id>', methods=['GET', 'POST'])
+@admin_required
 def edit_product(product_id):
     product = products_col.find_one({"_id": ObjectId(product_id)})
 
@@ -740,36 +741,54 @@ def bulk_remove():
 @csrf.exempt
 @app.route("/update_quantity_ajax/<product_id>", methods=["POST"])
 def update_quantity_ajax(product_id):
-    packet = request.form.get("packet")
     action = request.form.get("action")
-    new_qty = request.form.get("quantity")
+    packet = request.form.get("packet")
+    quantity = request.form.get("quantity")
+
     cart = session.get("cart", [])
-    item = None
 
-    # find matching item. if packet provided match both; otherwise match by id (first found)
-    for it in cart:
-        if str(it.get("id")) == str(product_id) and (packet is None or it.get("packet") == packet):
-            item = it
+    for item in cart:
+        if str(item.get("product_id")) == str(product_id) and item.get("packet") == packet:
+
             if action == "increase":
-                it["quantity"] = it.get("quantity", 0) + 1
+                item["quantity"] += 1
+
             elif action == "decrease":
-                it["quantity"] = max(1, it.get("quantity", 1) - 1)
-            elif action == "set":
-                try:
-                    it["quantity"] = max(1, int(new_qty))
-                except Exception:
-                    pass
-            break
+                if item["quantity"] > 1:
+                    item["quantity"] -= 1
 
-    if not item:
-        return jsonify({"success": False, "error": "Item not found in cart"}), 404
+            elif action == "set" and quantity is not None:
+                item["quantity"] = int(quantity)
 
-    subtotal = item["price"] * item["quantity"]
-    total = sum(i["price"] * i["quantity"] for i in cart)
-    session["cart"] = cart
-    session.modified = True
+            # If quantity becomes 0 → remove item
+            if item["quantity"] <= 0:
+                cart.remove(item)
+                session["cart"] = cart
+                session.modified = True
 
-    return jsonify({"success": True, "quantity": item["quantity"], "subtotal": subtotal, "total": total})
+                total = sum(i["price"] * i["quantity"] for i in cart)
+
+                return jsonify({
+                    "success": True,
+                    "quantity": 0,
+                    "subtotal": 0,
+                    "total": total
+                })
+
+            subtotal = item["price"] * item["quantity"]
+            total = sum(i["price"] * i["quantity"] for i in cart)
+
+            session["cart"] = cart
+            session.modified = True
+
+            return jsonify({
+                "success": True,
+                "quantity": item["quantity"],
+                "subtotal": subtotal,
+                "total": total
+            })
+
+    return jsonify({"success": False})
 
 # -------------------------
 # Non-AJAX (fallback) update quantity (form submit)
@@ -783,7 +802,7 @@ def update_quantity(product_id):
     item = None
 
     for it in cart:
-        if str(it.get("id")) == product_id and (packet is None or it.get("packet") == packet):
+        if str(it.get("product_id")) == str(product_id) and (packet is None or it.get("packet") == packet):
             item = it
             if action == "increase":
                 it["quantity"] = it.get("quantity", 0) + 1
@@ -897,7 +916,7 @@ def place_order():
         "status": order_status,
         "created_at": datetime.now(),
         "updated_at": datetime.now(),
-        "user_id": session.get("user_id"),
+        "user_id": ObjectId(session.get("user_id")),
         "status_history": [{
             "status": order_status,
             "timestamp": datetime.now()
