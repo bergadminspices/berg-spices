@@ -203,7 +203,7 @@ def get_cart_count():
 def is_product_in_cart(product_id):
     cart = session.get("cart", [])
     for item in cart:
-        if str(item.get("id")) == str(product_id):
+        if str(item.get("product_id")) == str(product_id):
             return True
     return False
 
@@ -242,8 +242,57 @@ def send_sms(phone_number, message):
 @app.route('/admin/products/add', methods=['GET', 'POST'])
 @admin_required
 def add_product():
+   if request.method == 'POST':
+    name = request.form['name']
+    packet_labels = request.form.getlist("packet_label[]")
+    packet_prices = request.form.getlist("packet_price[]")
+
+    price_options = []
+
+    for label, price in zip(packet_labels, packet_prices):
+        if label and price:
+            price_options.append({
+                "label": label.strip(),
+                "price": float(price)
+            })
+
+    description = request.form['description']
+    image_url = request.form['image_url']
+    stock = int(request.form['stock'])
+    category = request.form['category']
+
+    products_col.insert_one({
+        "name": name,
+        "price_options": price_options,
+        "description": description,
+        "image_url": image_url,
+        "stock": stock,
+        "category": category,
+        "created_at": datetime.utcnow()
+    })
+
+    flash("Product added successfully!", "success")
+    return redirect(url_for('admin_products'))
+
+    return render_template('add_product.html')
+# -------------------------
+# Edit_product
+# -------------------------
+@app.route('/admin/products/edit/<product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    product = products_col.find_one({"_id": ObjectId(product_id)})
+
+    if not product:
+        abort(404)
+
     if request.method == 'POST':
         name = request.form['name']
+        description = request.form['description']
+        image_url = request.form['image_url']
+        stock = int(request.form['stock'])
+        category = request.form['category']
+
+        # ✅ Dynamic Packet Pricing
         packet_labels = request.form.getlist("packet_label[]")
         packet_prices = request.form.getlist("packet_price[]")
 
@@ -256,57 +305,35 @@ def add_product():
                     "price": float(price)
                 })
 
-        description = request.form['description']
-        image_url = request.form['image_url']
-        stock = int(request.form['stock'])
-        category = request.form['category']
+        # Safety check (optional but recommended)
+        if not price_options:
+            flash("At least one packet option is required.", "danger")
+            return redirect(request.url)
 
-        mongo.db.products.insert_one({
-            "name": name,
-            "price": price,
-            "description": description,
-            "image_url": image_url,
-            "stock": stock,
-            "category": category,
-            "created_at": datetime.utcnow()
-        })
-
-        flash("Product added successfully!", "success")
-        return redirect(url_for('admin_products'))
-
-    return render_template('add_product.html')
-
-
-# -------------------------
-# Edit_product
-# -------------------------
-@app.route('/admin/products/edit/<product_id>', methods=['GET', 'POST'])
-def edit_product(product_id):
-    product = mongo.db.products.find_one({"_id": ObjectId(product_id)})
-
-    if request.method == 'POST':
-        mongo.db.products.update_one(
+        products_col.update_one(
             {"_id": ObjectId(product_id)},
             {"$set": {
-                "name": request.form['name'],
-                "price": float(request.form['price']),
-                "description": request.form['description'],
-                "image_url": request.form['image_url'],
-                "stock": int(request.form['stock']),
-                "category": request.form['category']
+                "name": name,
+                "price_options": price_options,
+                "description": description,
+                "image_url": image_url,
+                "stock": stock,
+                "category": category,
+                "updated_at": datetime.utcnow()
             }}
         )
 
-        flash("Product updated!", "success")
+        flash("Product updated successfully!", "success")
         return redirect(url_for('admin_products'))
 
     return render_template('edit_product.html', product=product)
+
 # -------------------------
 # Delete_product
 # -------------------------
 @app.route('/admin/products')
 def admin_products():
-    products = mongo.db.products.find()
+    products = products_col.find()
     return render_template('admin_products.html', products=products)
 
 #------------------------
@@ -552,7 +579,7 @@ def product_detail(product_id):
 @app.route("/add-to-cart/<product_id>", methods=["POST"])
 def add_to_cart(product_id):
 
-    product = mongo.db.products.find_one({"_id": ObjectId(product_id)})
+    product = db.products.find_one({"_id": ObjectId(product_id)})
 
     if not product:
         flash("Product not found.", "danger")
@@ -625,10 +652,10 @@ def view_cart():
 def remove_from_cart(product_id):
     packet = request.form.get("packet")
     if packet:
-        new_cart = [item for item in session.get("cart", []) if not (str(item.get("id")) == str(product_id) and item.get("packet") == packet)]
+        new_cart = [item for item in session.get("cart", []) if not (str(item.get("product_id")) == str(product_id) and item.get("packet") == packet)]
     else:
         # if packet not provided, remove items matching the id
-        new_cart = [item for item in session.get("cart", []) if not (str(item.get("id")) == str(product_id))]
+        new_cart = [item for item in session.get("cart", []) if not (str(item.get("product_id")) == str(product_id))]
     session["cart"] = new_cart
     flash("Item removed", "success")
     return redirect(url_for("view_cart"))
