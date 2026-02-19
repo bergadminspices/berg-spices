@@ -72,7 +72,12 @@
                   <input type="checkbox" name="selected_items" value="{{ item.id }}||{{ item.packet }}">
                 </td>
                 <td>
-                  <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-img">
+                  {% if item.image.startswith('http') %}
+					<img src="{{ item.image }}" alt="{{ item.name }}" class="cart-img">
+				{% else %}
+					<img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}" class="cart-img">
+				{% endif %}
+
 
                   <span class="ms-2">{{ item.name }}</span>
                 </td>
