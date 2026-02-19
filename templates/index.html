@@ -42,7 +42,12 @@
           {% for product in items %}
           <div class="col-md-3">
             <div class="card h-100 text-center p-3">
-              <img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top mx-auto" style="max-height:200px; object-fit:contain;" alt="{{ product.name }}">
+              {% if product.image_url.startswith('http') %}
+			<img src="{{ product.image_url }}" class="card-img-top mx-auto" style="max-height:200px; object-fit:contain;" alt="{{ product.name }}">
+			{% else %}
+				<img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top mx-auto" style="max-height:200px; object-fit:contain;" alt="{{ product.name }}">
+			{% endif %}
+
               <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <div class="rating">★★★★★</div>
