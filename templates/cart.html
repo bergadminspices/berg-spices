@@ -43,9 +43,94 @@
 
 {% else %}
 
+
+<div class="mb-3">
+  <button id="delete-selected" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Remove Selected
+  </button>
+</div>
+
 <div class="table-responsive">
 <table class="table table-striped align-middle cart-table">
+
 <thead>
+<tr>
+  <th>
+    <input type="checkbox" id="select-all">
+  </th>
+  <th>Product</th>
+  <th>Packet</th>
+  <th>Quantity</th>
+  <th>Price</th>
+  <th>Subtotal</th>
+  <th></th>
+</tr>
+</thead>
+
+<tbody>
+{% for item in cart %}
+<tr data-id="{{ item.product_id }}" data-packet="{{ item.packet }}">
+
+  <td>
+    <input type="checkbox" class="select-item">
+  </td>
+
+  <td>
+    {% if item.image.startswith('http') %}
+      <img src="{{ item.image }}" class="cart-img">
+    {% else %}
+      <img src="{{ url_for('static', filename=item.image) }}" class="cart-img">
+    {% endif %}
+    <span class="ms-2">{{ item.name }}</span>
+  </td>
+
+  <td>{{ item.packet }}</td>
+
+  <td>
+    <div class="quantity-controls">
+      <button class="btn btn-outline-secondary decrease">
+        <span class="btn-text"><i class="fas fa-minus"></i></span>
+        <span class="spinner-border spinner-border-sm d-none"></span>
+      </button>
+
+      <input type="number"
+             class="form-control form-control-sm quantity-input"
+             value="{{ item.quantity }}"
+             min="1">
+
+      <button class="btn btn-outline-secondary increase">
+        <span class="btn-text"><i class="fas fa-plus"></i></span>
+        <span class="spinner-border spinner-border-sm d-none"></span>
+      </button>
+    </div>
+  </td>
+
+  <td>₹{{ "%.2f"|format(item.price) }}</td>
+  <td class="subtotal">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+
+  <td>
+    <button class="btn btn-outline-danger remove-item">
+      <i class="bi bi-trash"></i>
+      <span class="spinner-border spinner-border-sm d-none"></span>
+    </button>
+  </td>
+
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+</div>
+
+<table class="table table-striped align-middle cart-table">
+<thead>
+<th>
+  <input type="checkbox" id="select-all">
+</th>
+<button id="delete-selected" class="btn btn-danger mb-3">
+  <i class="fas fa-trash"></i> Remove Selected
+</button>
+
 <tr>
   <th>Product</th>
   <th>Packet</th>
@@ -58,7 +143,10 @@
 
 <tbody>
 {% for item in cart %}
-<tr data-id="{{ item.id }}" data-packet="{{ item.packet }}">
+<td>
+  <input type="checkbox" class="select-item">
+</td>
+<tr data-id="{{ item.product_id }}" data-packet="{{ item.packet }}">
   <td>
     {% if item.image.startswith('http') %}
       <img src="{{ item.image }}" class="cart-img">
@@ -104,13 +192,24 @@
 </table>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mt-4">
-  <h4>Total: <span id="cart-total" class="text-success">₹{{ "%.2f"|format(total) }}</span></h4>
+<div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
+
+  <a href="{{ url_for('home') }}" class="btn btn-outline-success btn-lg">
+    <i class="fas fa-arrow-left"></i> Continue Shopping
+  </a>
+
+  <h4 class="mb-0">
+    Total: <span id="cart-total" class="text-success">
+      ₹{{ "%.2f"|format(total) }}
+    </span>
+  </h4>
 
   <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg">
     <i class="fas fa-credit-card"></i> Checkout
   </a>
+
 </div>
+
 
 {% endif %}
 </div>
@@ -205,6 +304,16 @@ $(document).on("click", ".remove-item", function(){
         }
     });
 });
+$("#select-all").click(function(){
+    $(".select-item").prop("checked", this.checked);
+});
+
+$("#delete-selected").click(function(){
+    $(".select-item:checked").each(function(){
+        $(this).closest("tr").find(".remove-item").click();
+    });
+});
+
 </script>
 
 </body>
