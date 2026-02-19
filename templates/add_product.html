@@ -9,7 +9,7 @@
 
         <div class="card-body">
             <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <!-- Product Name -->
                 <div class="mb-3">
                     <label class="form-label">Product Name</label>
@@ -63,15 +63,7 @@
                               rows="3"></textarea>
                 </div>
 
-                <!-- Image URL -->
-                <div class="mb-3">
-                    <label class="form-label">Image URL (Cloudinary)</label>
-                    <input type="text"
-                           name="image_url"
-                           class="form-control">
-                </div>
-
-                <!-- Upload Image -->
+               <!-- Upload Image -->
                 <div class="mb-3">
                     <label class="form-label">Upload Image</label>
                     <input type="file"
@@ -132,4 +124,3 @@ document.addEventListener("click", function (e) {
 </script>
 
 {% endblock %}
-
