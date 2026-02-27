@@ -614,6 +614,13 @@ header {
   }
 }
 
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
 
 .navbar-custom {
   background: rgba(46, 125, 50, 0.95);
@@ -820,7 +827,6 @@ header {
     font-size: 14px;
   }
 }
-
 .main-footer{
     background:#f3f3f3;
     padding:40px 15px;
