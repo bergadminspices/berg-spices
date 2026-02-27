@@ -606,7 +606,11 @@ header {
 
 @media (max-width: 576px) {
   .bee {
-    display: none;
+    width: 30px;
+  }
+
+  .bee-container {
+    top: 100px;
   }
 }
 
