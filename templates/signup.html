@@ -4,45 +4,149 @@
   <meta charset="UTF-8">
   <title>Sign Up</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
-    body { background: #fffdf5; }
-    .navbar { background: #2e7d32; }
-    .navbar-brand img { height: 100px; border-radius: 40px; }
-    .brand-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.76rem; color: #fbc02d; line-height: 1.2; }
-    .navbar-quote { font-size: 0.9rem; font-style: italic; color: #fbc02d; }
-    .nav-link, .btn-cart { color: white !important; }
-    .nav-link:hover { color: #fbc02d !important; }
-    .card { border: none; border-radius: 15px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); }
-    .btn-success { background-color: #2e7d32 !important; border: none; }
-    .btn-success:hover { background-color: #256428 !important; }
-  </style>
+  body {
+    background: linear-gradient(135deg, #fdf6e3, #fffdf5);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .navbar {
+    background: linear-gradient(90deg, #1b5e20, #2e7d32);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .navbar-brand img {
+    height: 85px;
+    border-radius: 20px;
+  }
+
+  .brand-text {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: #fbc02d;
+  }
+
+  .navbar-quote {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #fbc02d;
+  }
+
+  .nav-link, .btn-cart {
+    color: white !important;
+    font-weight: 500;
+  }
+
+  .nav-link:hover {
+    color: #fbc02d !important;
+  }
+
+  .signup-card {
+    border: none;
+    border-radius: 20px;
+    padding: 40px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    border-top: 4px solid #fbc02d;
+    transition: transform 0.3s ease;
+  }
+
+  .signup-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .form-control {
+    border-radius: 10px;
+    padding-left: 40px;
+  }
+
+  .input-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #2e7d32;
+  }
+
+  .form-group {
+    position: relative;
+  }
+
+  .btn-success {
+    background: linear-gradient(90deg, #2e7d32, #1b5e20);
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    padding: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(90deg, #256428, #144d17);
+    transform: scale(1.03);
+  }
+
+  a {
+    color: #2e7d32;
+    font-weight: 500;
+  }
+
+  a:hover {
+    color: #fbc02d;
+  }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
 
 <!-- Navbar -->
+
 <nav class="navbar navbar-expand-lg">
   <div class="container">
+
+    <!-- Logo -->
     <a class="navbar-brand" href="{{ url_for('home') }}">
       <img src="{{ url_for('static', filename='logo.jpg') }}" alt="BERG Spices Logo">
     </a>
+
+    <!-- Brand Text -->
     <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
       <div class="ms-2 d-flex flex-column">
         <span class="brand-text">BERG SPICES</span>
         <span class="navbar-quote">"The taste of mountains"</span>
       </div>
     </a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('home') }}">Back to Home</a>
-        </li>
-      </ul>
+
+    <!-- Toggle Button (Mobile Only) -->
+    <button class="navbar-toggler text-white" type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="ms-auto d-flex align-items-center gap-3">
+
+        <a class="nav-link d-flex align-items-center" href="{{ url_for('home') }}">
+          <i class="bi bi-house-door-fill me-1"></i> Home
+        </a>
+
+        <a href="{{ url_for('view_cart') }}" class="position-relative text-white">
+          <i class="bi bi-cart-fill fs-5"></i>
+          {% if cart_count and cart_count > 0 %}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+            {{ cart_count }}
+          </span>
+          {% endif %}
+        </a>
+
+      </div>
     </div>
-    <div class="ms-auto">
-      <a href="{{ url_for('view_cart') }}" class="btn btn-cart">
-        Cart ({{ cart_count or 0 }})
-      </a>
-    </div>
+
   </div>
 </nav>
 
@@ -50,9 +154,11 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-5">
-      <div class="card p-4 shadow">
+      <div class="signup-card">
         <h3 class="mb-3 text-center">Create Account</h3>
-
+		<p class="text-center text-muted mb-4">
+		  Join the BERG family and experience mountain freshness.
+		</p>
         <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -67,45 +173,44 @@
 
         <form method="post" novalidate>
 		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input type="text"
-                   name="name"
-                   class="form-control"
-                   minlength="3"
-                   placeholder="Your full name"
-                   required>
-          </div>
+          <div class="mb-3 form-group">
+		  <i class="bi bi-person-fill input-icon"></i>
+		  <input type="text"
+				 name="name"
+				 class="form-control"
+				 minlength="3"
+				 placeholder="Your full name"
+				 required>
+		</div>
 
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email"
-                   name="email"
-                   class="form-control"
-                   placeholder="example@email.com"
-                   required>
-          </div>
+          <div class="mb-3 form-group">
+		  <i class="bi bi-envelope-fill input-icon"></i>
+		  <input type="email"
+				 name="email"
+				 class="form-control"
+				 placeholder="example@email.com"
+				 required>
+		</div>
 
-          <div class="mb-3">
-            <label class="form-label">Phone</label>
-            <input type="tel"
-                   name="phone"
-                   class="form-control"
-                   pattern="[0-9]{10}"
-                   title="Enter a 10-digit phone number"
-                   placeholder="10 digit mobile number"
-                   required>
-          </div>
+          <div class="mb-3 form-group">
+		  <i class="bi bi-telephone-fill input-icon"></i>
+		  <input type="tel"
+				 name="phone"
+				 class="form-control"
+				 pattern="[0-9]{10}"
+				 placeholder="10 digit mobile number"
+				 required>
+		</div>
 
-          <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password"
-                   name="password"
-                   class="form-control"
-                   minlength="8"
-                   placeholder="Minimum 8 characters"
-                   required>
-          </div>
+          <div class="mb-3 form-group">
+		  <i class="bi bi-lock-fill input-icon"></i>
+		  <input type="password"
+				 name="password"
+				 class="form-control"
+				 minlength="8"
+				 placeholder="Minimum 8 characters"
+				 required>
+		</div>
 
           <button class="btn btn-success w-100">Sign Up</button>
         </form>
